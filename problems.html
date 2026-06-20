@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Problems - Placify</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style-additions.css" />
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="layout-wrapper">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <i data-lucide="code-2" class="text-primary mr-2"></i>
+        Placify
+      </div>
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="problems.html" class="nav-item active">
+          <i data-lucide="code-2"></i>
+          <span>Problems</span>
+        </a>
+        <a href="learning.html" class="nav-item">
+          <i data-lucide="book-open"></i>
+          <span>Learning Paths</span>
+        </a>
+        <a href="interviews.html" class="nav-item">
+          <i data-lucide="message-square"></i>
+          <span>Mock Interviews</span>
+        </a>
+        <a href="jobs.html" class="nav-item">
+          <i data-lucide="file-search"></i>
+          <span>Resume Scanner</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="settings.html" class="nav-item">
+          <i data-lucide="settings"></i>
+          <span>Settings</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-content">
+      
+      <!-- Top Nav -->
+      <header class="top-nav">
+        <div class="search-bar">
+          <i data-lucide="search" class="text-secondary"></i>
+          <input type="text" placeholder="Search problems, articles, or users..." />
+        </div>
+        <div class="user-actions">
+          <button class="icon-btn">
+            <i data-lucide="bell"></i>
+          </button>
+          <a href="login.html" class="avatar" style="text-decoration: none;">P</a>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <main class="content-area">
+        <div class="dashboard-grid">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="card-title" style="font-size: 1.5rem;">Coding Problems</h2>
+            <button class="btn btn-primary">Pick One</button>
+          </div>
+
+          <div class="card">
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th width="5%">Status</th>
+                    <th width="55%">Title</th>
+                    <th width="15%">Difficulty</th>
+                    <th width="15%">Acceptance</th>
+                    <th width="10%">Action</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td><div class="status-icon"><i data-lucide="check-circle-2" class="text-success"></i></div></td>
+                    <td class="font-medium text-primary">1. Two Sum</td>
+                    <td><span class="tag tag-easy">Easy</span></td>
+                    <td>50.2%</td>
+                    <td><button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Solve</button></td>
+                  </tr>
+                  <tr>
+                    <td><div class="status-icon"><i data-lucide="circle" class="text-secondary"></i></div></td>
+                    <td class="font-medium text-primary">2. Add Two Numbers</td>
+                    <td><span class="tag tag-medium">Medium</span></td>
+                    <td>41.5%</td>
+                    <td><button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Solve</button></td>
+                  </tr>
+                  <tr>
+                    <td><div class="status-icon"><i data-lucide="circle" class="text-secondary"></i></div></td>
+                    <td class="font-medium text-primary">3. Longest Substring Without Repeating Characters</td>
+                    <td><span class="tag tag-medium">Medium</span></td>
+                    <td>34.1%</td>
+                    <td><button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Solve</button></td>
+                  </tr>
+                  <tr>
+                    <td><div class="status-icon"><i data-lucide="check-circle-2" class="text-success"></i></div></td>
+                    <td class="font-medium text-primary">4. Median of Two Sorted Arrays</td>
+                    <td><span class="tag tag-hard">Hard</span></td>
+                    <td>38.2%</td>
+                    <td><button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Solve</button></td>
+                  </tr>
+                  <tr>
+                    <td><div class="status-icon"><i data-lucide="circle" class="text-secondary"></i></div></td>
+                    <td class="font-medium text-primary">5. Longest Palindromic Substring</td>
+                    <td><span class="tag tag-medium">Medium</span></td>
+                    <td>33.1%</td>
+                    <td><button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">Solve</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

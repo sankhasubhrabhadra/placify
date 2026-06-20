@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Mock Interviews - Placify</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style-additions.css" />
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="layout-wrapper">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <i data-lucide="code-2" class="text-primary mr-2"></i>
+        Placify
+      </div>
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="problems.html" class="nav-item">
+          <i data-lucide="code-2"></i>
+          <span>Problems</span>
+        </a>
+        <a href="learning.html" class="nav-item">
+          <i data-lucide="book-open"></i>
+          <span>Learning Paths</span>
+        </a>
+        <a href="interviews.html" class="nav-item active">
+          <i data-lucide="message-square"></i>
+          <span>Mock Interviews</span>
+        </a>
+        <a href="jobs.html" class="nav-item">
+          <i data-lucide="file-search"></i>
+          <span>Resume Scanner</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="settings.html" class="nav-item">
+          <i data-lucide="settings"></i>
+          <span>Settings</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-content">
+      
+      <!-- Top Nav -->
+      <header class="top-nav">
+        <div class="search-bar">
+          <i data-lucide="search" class="text-secondary"></i>
+          <input type="text" placeholder="Search problems, articles, or users..." />
+        </div>
+        <div class="user-actions">
+          <button class="icon-btn">
+            <i data-lucide="bell"></i>
+          </button>
+          <a href="login.html" class="avatar" style="text-decoration: none;">P</a>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <main class="content-area">
+        <div class="dashboard-grid">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="card-title" style="font-size: 1.5rem;">Mock Interviews</h2>
+            <button class="btn btn-primary">Schedule Interview</button>
+          </div>
+
+          <div class="grid grid-cols-2 gap-6">
+            <!-- Upcoming -->
+            <div class="card">
+              <div class="flex items-center gap-2 mb-4 pb-3 border-b">
+                <i data-lucide="calendar" class="text-primary"></i>
+                <h3 class="card-title">Upcoming</h3>
+              </div>
+              
+              <div class="flex-col gap-4">
+                <div class="card" style="background-color: var(--surface-color); border-color: var(--primary-accent);">
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="font-medium">System Design</span>
+                    <span class="tag tag-medium text-primary" style="background-color: rgba(255,161,22,0.1);">In 2 Days</span>
+                  </div>
+                  <div class="flex items-center gap-2 text-secondary" style="font-size: 0.875rem;">
+                    <i data-lucide="clock" size="14"></i>
+                    <span>June 21, 2:00 PM EST</span>
+                  </div>
+                  <div class="flex items-center gap-2 text-secondary mt-2" style="font-size: 0.875rem;">
+                    <i data-lucide="user" size="14"></i>
+                    <span>Interviewer: Senior SWE @ Google</span>
+                  </div>
+                  <div class="mt-4 flex gap-2">
+                    <button class="btn btn-primary" style="flex: 1;">Join Room</button>
+                    <button class="btn btn-outline" style="flex: 1;">Reschedule</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Past Feedback -->
+            <div class="card">
+              <div class="flex items-center gap-2 mb-4 pb-3 border-b">
+                <i data-lucide="history" class="text-secondary"></i>
+                <h3 class="card-title">Past Interviews</h3>
+              </div>
+              
+              <div class="flex-col gap-4">
+                <!-- Item 1 -->
+                <div class="flex justify-between items-center pb-3 border-b">
+                  <div class="flex-col gap-1">
+                    <span class="font-medium">Data Structures & Algo</span>
+                    <span class="text-secondary" style="font-size: 0.75rem;">June 14, 2026 • Rating: 4.5/5</span>
+                  </div>
+                  <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">View Feedback</button>
+                </div>
+                <!-- Item 2 -->
+                <div class="flex justify-between items-center pb-3 border-b">
+                  <div class="flex-col gap-1">
+                    <span class="font-medium">Frontend Architecture</span>
+                    <span class="text-secondary" style="font-size: 0.75rem;">May 28, 2026 • Rating: 3.8/5</span>
+                  </div>
+                  <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">View Feedback</button>
+                </div>
+                <!-- Item 3 -->
+                <div class="flex justify-between items-center">
+                  <div class="flex-col gap-1">
+                    <span class="font-medium">Behavioral</span>
+                    <span class="text-secondary" style="font-size: 0.75rem;">May 10, 2026 • Rating: 5.0/5</span>
+                  </div>
+                  <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">View Feedback</button>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

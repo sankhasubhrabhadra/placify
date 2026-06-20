@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Learning Paths - Placify</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style-additions.css" />
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="layout-wrapper">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <i data-lucide="code-2" class="text-primary mr-2"></i>
+        Placify
+      </div>
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="problems.html" class="nav-item">
+          <i data-lucide="code-2"></i>
+          <span>Problems</span>
+        </a>
+        <a href="learning.html" class="nav-item active">
+          <i data-lucide="book-open"></i>
+          <span>Learning Paths</span>
+        </a>
+        <a href="interviews.html" class="nav-item">
+          <i data-lucide="message-square"></i>
+          <span>Mock Interviews</span>
+        </a>
+        <a href="jobs.html" class="nav-item">
+          <i data-lucide="file-search"></i>
+          <span>Resume Scanner</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="settings.html" class="nav-item">
+          <i data-lucide="settings"></i>
+          <span>Settings</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-content">
+      
+      <!-- Top Nav -->
+      <header class="top-nav">
+        <div class="search-bar">
+          <i data-lucide="search" class="text-secondary"></i>
+          <input type="text" placeholder="Search problems, articles, or users..." />
+        </div>
+        <div class="user-actions">
+          <button class="icon-btn">
+            <i data-lucide="bell"></i>
+          </button>
+          <a href="login.html" class="avatar" style="text-decoration: none;">P</a>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <main class="content-area">
+        <div class="dashboard-grid">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="card-title" style="font-size: 1.5rem;">Learning Paths</h2>
+          </div>
+
+          <div class="grid grid-cols-2 gap-6">
+            <!-- Course 1 -->
+            <div class="card flex-col gap-4">
+              <div class="flex justify-between items-start">
+                <div class="company-logo" style="background-color: rgba(255,161,22,0.1);">
+                  <i data-lucide="layers" class="text-primary"></i>
+                </div>
+                <span class="tag tag-medium">Intermediate</span>
+              </div>
+              <div>
+                <h3 class="stat-title" style="font-size: 1.125rem; color: var(--text-primary); font-weight: 600;">Data Structures Crash Course</h3>
+                <p class="mt-2" style="font-size: 0.875rem;">Master the core data structures needed to ace top-tier coding interviews.</p>
+              </div>
+              <div class="progress-wrapper mt-auto pt-4">
+                <div class="progress-header">
+                  <span>80% Completed</span>
+                  <span class="text-primary">120 / 150</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill" style="width: 80%; background-color: var(--primary-accent)"></div>
+                </div>
+              </div>
+              <button class="btn btn-outline btn-block mt-2">Continue Learning</button>
+            </div>
+
+            <!-- Course 2 -->
+            <div class="card flex-col gap-4">
+              <div class="flex justify-between items-start">
+                <div class="company-logo" style="background-color: rgba(0,184,163,0.1);">
+                  <i data-lucide="cpu" class="text-success"></i>
+                </div>
+                <span class="tag tag-easy">Beginner</span>
+              </div>
+              <div>
+                <h3 class="stat-title" style="font-size: 1.125rem; color: var(--text-primary); font-weight: 600;">Algorithms 101</h3>
+                <p class="mt-2" style="font-size: 0.875rem;">A fundamental guide to sorting, searching, and algorithmic analysis.</p>
+              </div>
+              <div class="progress-wrapper mt-auto pt-4">
+                <div class="progress-header">
+                  <span>85% Completed</span>
+                  <span class="text-success">85 / 100</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill" style="width: 85%; background-color: var(--success-color)"></div>
+                </div>
+              </div>
+              <button class="btn btn-outline btn-block mt-2">Continue Learning</button>
+            </div>
+
+            <!-- Course 3 -->
+            <div class="card flex-col gap-4">
+              <div class="flex justify-between items-start">
+                <div class="company-logo" style="background-color: rgba(255,200,87,0.1);">
+                  <i data-lucide="server" class="text-warning"></i>
+                </div>
+                <span class="tag tag-hard">Advanced</span>
+              </div>
+              <div>
+                <h3 class="stat-title" style="font-size: 1.125rem; color: var(--text-primary); font-weight: 600;">System Design Masterclass</h3>
+                <p class="mt-2" style="font-size: 0.875rem;">Design scalable, reliable, and maintainable large-scale systems.</p>
+              </div>
+              <div class="progress-wrapper mt-auto pt-4">
+                <div class="progress-header">
+                  <span>30% Completed</span>
+                  <span class="text-warning">15 / 50</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill" style="width: 30%; background-color: var(--warning-color)"></div>
+                </div>
+              </div>
+              <button class="btn btn-outline btn-block mt-2">Continue Learning</button>
+            </div>
+
+            <!-- Course 4 -->
+            <div class="card flex-col gap-4">
+              <div class="flex justify-between items-start">
+                <div class="company-logo" style="background-color: rgba(255,107,107,0.1);">
+                  <i data-lucide="database" class="text-error"></i>
+                </div>
+                <span class="tag tag-medium">Intermediate</span>
+              </div>
+              <div>
+                <h3 class="stat-title" style="font-size: 1.125rem; color: var(--text-primary); font-weight: 600;">Advanced SQL Database</h3>
+                <p class="mt-2" style="font-size: 0.875rem;">Complex queries, query optimization, and schema design.</p>
+              </div>
+              <div class="progress-wrapper mt-auto pt-4">
+                <div class="progress-header">
+                  <span>0% Completed</span>
+                  <span class="text-error">0 / 40</span>
+                </div>
+                <div class="progress-bar-container">
+                  <div class="progress-bar-fill" style="width: 0%; background-color: var(--error-color)"></div>
+                </div>
+              </div>
+              <button class="btn btn-primary btn-block mt-2">Start Course</button>
+            </div>
+
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

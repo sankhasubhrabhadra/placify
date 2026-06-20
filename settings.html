@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Settings - Placify</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style-additions.css" />
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="layout-wrapper">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <i data-lucide="code-2" class="text-primary mr-2"></i>
+        Placify
+      </div>
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="problems.html" class="nav-item">
+          <i data-lucide="code-2"></i>
+          <span>Problems</span>
+        </a>
+        <a href="learning.html" class="nav-item">
+          <i data-lucide="book-open"></i>
+          <span>Learning Paths</span>
+        </a>
+        <a href="interviews.html" class="nav-item">
+          <i data-lucide="message-square"></i>
+          <span>Mock Interviews</span>
+        </a>
+        <a href="jobs.html" class="nav-item">
+          <i data-lucide="file-search"></i>
+          <span>Resume Scanner</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="settings.html" class="nav-item active">
+          <i data-lucide="settings"></i>
+          <span>Settings</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-content">
+      
+      <!-- Top Nav -->
+      <header class="top-nav">
+        <div class="search-bar">
+          <i data-lucide="search" class="text-secondary"></i>
+          <input type="text" placeholder="Search problems, articles, or users..." />
+        </div>
+        <div class="user-actions">
+          <button class="icon-btn">
+            <i data-lucide="bell"></i>
+          </button>
+          <a href="login.html" class="avatar" style="text-decoration: none;">P</a>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <main class="content-area">
+        <div class="dashboard-grid">
+          <h2 class="card-title mb-4" style="font-size: 1.5rem;">Settings</h2>
+          
+          <div class="grid grid-cols-2 gap-6">
+            <!-- Profile Settings -->
+            <div class="card">
+              <h3 class="card-title pb-3 border-b mb-4">Profile Information</h3>
+              <form>
+                <div class="form-group">
+                  <label class="form-label">Full Name</label>
+                  <input type="text" class="form-input" value="Placify User" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Email Address</label>
+                  <input type="email" class="form-input" value="user@placify.dev" />
+                </div>
+                <div class="form-group">
+                  <label class="form-label">Title / Headline</label>
+                  <input type="text" class="form-input" value="Software Engineer" />
+                </div>
+                <div class="form-group mt-4">
+                  <button type="button" class="btn btn-primary">Save Changes</button>
+                </div>
+              </form>
+            </div>
+
+            <!-- Preferences -->
+            <div class="card">
+              <h3 class="card-title pb-3 border-b mb-4">Preferences</h3>
+              <form>
+                <div class="form-group flex justify-between items-center" style="flex-direction: row;">
+                  <label class="form-label mb-0">Email Notifications</label>
+                  <input type="checkbox" checked />
+                </div>
+                <div class="form-group flex justify-between items-center" style="flex-direction: row; margin-top: 1rem;">
+                  <label class="form-label mb-0">Public Profile</label>
+                  <input type="checkbox" checked />
+                </div>
+                <div class="form-group flex justify-between items-center" style="flex-direction: row; margin-top: 1rem;">
+                  <label class="form-label mb-0">Dark Mode</label>
+                  <input type="checkbox" checked disabled /> <!-- Forced dark mode for this design -->
+                </div>
+                <div class="form-group mt-4">
+                  <button type="button" class="btn btn-outline" style="border-color: var(--error-color); color: var(--error-color);">Delete Account</button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>

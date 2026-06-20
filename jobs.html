@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resume Scanner - Placify</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style-additions.css" />
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="layout-wrapper">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <i data-lucide="code-2" class="text-primary mr-2"></i>
+        Placify
+      </div>
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="problems.html" class="nav-item">
+          <i data-lucide="code-2"></i>
+          <span>Problems</span>
+        </a>
+        <a href="learning.html" class="nav-item">
+          <i data-lucide="book-open"></i>
+          <span>Learning Paths</span>
+        </a>
+        <a href="interviews.html" class="nav-item">
+          <i data-lucide="message-square"></i>
+          <span>Mock Interviews</span>
+        </a>
+        <a href="jobs.html" class="nav-item active">
+          <i data-lucide="file-search"></i>
+          <span>Resume Scanner</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="settings.html" class="nav-item">
+          <i data-lucide="settings"></i>
+          <span>Settings</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-content">
+      
+      <!-- Top Nav -->
+      <header class="top-nav">
+        <div class="search-bar">
+          <i data-lucide="search" class="text-secondary"></i>
+          <input type="text" placeholder="Search problems, articles, or users..." />
+        </div>
+        <div class="user-actions">
+          <button class="icon-btn">
+            <i data-lucide="bell"></i>
+          </button>
+          <a href="login.html" class="avatar" style="text-decoration: none;">P</a>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <main class="content-area">
+        <div class="dashboard-grid">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="card-title" style="font-size: 1.5rem;">Resume Scanner</h2>
+          </div>
+
+          <div class="grid grid-cols-1 gap-6">
+            <div class="card">
+              <h3 class="font-medium">Upload or paste a resume</h3>
+              <p class="text-secondary" style="font-size: 0.9rem;">Supports plain text and PDF. The scanner will extract name, emails, phones and common skills.</p>
+
+              <div style="margin-top:1rem;">
+                <input type="file" id="resumeFile" accept=".pdf,.txt" />
+                <button id="parseBtn" class="btn btn-primary" style="margin-left:8px;">Scan Resume</button>
+              </div>
+
+              <div style="margin-top:1rem;">
+                <label for="resumeText">Or paste resume text:</label>
+                <textarea id="resumeText" rows="8" style="width:100%; margin-top:0.5rem; padding:0.5rem; border-radius:6px; border:1px solid var(--border-color);"></textarea>
+              </div>
+
+              <div id="scanResults" style="margin-top:1rem;"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
