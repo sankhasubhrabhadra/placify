@@ -1,0 +1,23 @@
+{
+  "backend_engineer": {
+    "title": "Backend Engineer",
+    "required_skills": ["python", "sql", "rest", "api"],
+    "preferred_skills": ["django", "fastapi", "flask", "postgresql", "docker", "aws"],
+    "min_exp": 2,
+    "education_keywords": ["computer science", "software engineering", "information technology", "b.tech", "b.e.", "bachelor"]
+  },
+  "fullstack_engineer": {
+    "title": "Full Stack Engineer",
+    "required_skills": ["javascript", "react", "node", "sql", "api"],
+    "preferred_skills": ["typescript", "python", "docker", "aws", "mongodb"],
+    "min_exp": 2,
+    "education_keywords": ["computer science", "software engineering", "bachelor"]
+  },
+  "data_engineer": {
+    "title": "Data Engineer",
+    "required_skills": ["python", "sql", "pandas"],
+    "preferred_skills": ["spark", "airflow", "aws", "postgresql", "docker", "etl"],
+    "min_exp": 1,
+    "education_keywords": ["computer science", "data science", "statistics", "bachelor", "master"]
+  }
+}
