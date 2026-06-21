@@ -3,13 +3,15 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Resume Scanner - Placify</title>
+  <title>Placify Dashboard</title>
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="style-additions.css" />
   <!-- Google Fonts: Inter -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Lucide Icons -->
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
@@ -23,7 +25,7 @@
         Placify
       </div>
       <nav class="sidebar-nav">
-        <a href="index.html" class="nav-item">
+        <a href="index.html" class="nav-item active">
           <i data-lucide="layout-dashboard"></i>
           <span>Dashboard</span>
         </a>
@@ -39,7 +41,7 @@
           <i data-lucide="message-square"></i>
           <span>Mock Interviews</span>
         </a>
-        <a href="jobs.html" class="nav-item active">
+        <a href="jobs.html" class="nav-item">
           <i data-lucide="file-search"></i>
           <span>Resume Scanner</span>
         </a>
@@ -69,31 +71,68 @@
         </div>
       </header>
 
-      <!-- Content -->
+      <!-- Dashboard Content -->
       <main class="content-area">
         <div class="dashboard-grid">
-          <div class="flex justify-between items-center mb-4">
-            <h2 class="card-title" style="font-size: 1.5rem;">Resume Scanner</h2>
+          
+          <!-- Top Row: Stat Cards -->
+          <div class="stats-row" id="stats-row">
+            <!-- Will be populated by JS -->
           </div>
 
-          <div class="grid grid-cols-1 gap-6">
-            <div class="card">
-              <h3 class="font-medium">Upload or paste a resume</h3>
-              <p class="text-secondary" style="font-size: 0.9rem;">Supports plain text and PDF. The scanner will extract name, emails, phones and common skills.</p>
-
-              <div style="margin-top:1rem;">
-                <input type="file" id="resumeFile" accept=".pdf,.txt" />
-                <button id="parseBtn" class="btn btn-primary" style="margin-left:8px;">Scan Resume</button>
+          <!-- Middle Row: Chart & Progress -->
+          <div class="middle-row">
+            <div class="card chart-card">
+              <div class="card-header">
+                <h3 class="card-title">Activity Overview</h3>
+              </div>
+              <div class="chart-container">
+                <canvas id="activityChart"></canvas>
+              </div>
+            </div>
+            
+            <div class="card progress-card">
+              <h3 class="card-title mb-4">Preparation Progress</h3>
+              
+              <div id="progress-container">
+                <!-- Progress will be populated by JS -->
               </div>
 
-              <div style="margin-top:1rem;">
-                <label for="resumeText">Or paste resume text:</label>
-                <textarea id="resumeText" rows="8" style="width:100%; margin-top:0.5rem; padding:0.5rem; border-radius:6px; border:1px solid var(--border-color);"></textarea>
+              <h3 class="card-title mb-3 mt-4">Top Skills</h3>
+              <div class="badges-container" id="top-skills-container">
+                <!-- Top skills will be populated by JS -->
               </div>
-
-              <div id="scanResults" style="margin-top:1rem;"></div>
             </div>
           </div>
+
+          <!-- Bottom Row: Timeline & Chat -->
+          <div class="bottom-row">
+            <div class="card timeline-card">
+              <h3 class="card-title mb-4">Recent Activity</h3>
+              <div class="timeline" id="timeline-container">
+                <!-- Timeline populated by JS -->
+              </div>
+            </div>
+            
+            <div class="card chat-card">
+              <div class="chat-header pb-3 border-b mb-3">
+                <i data-lucide="bot" class="text-primary mr-2"></i>
+                <h3 class="card-title" style="display:inline-block;">Placify AI Coach</h3>
+              </div>
+              <div class="chat-messages" id="chatMessages">
+                <div class="chat-bubble receive">
+                  <p>Hi! I'm your AI Coach. How can I help you prepare today?</p>
+                </div>
+              </div>
+              <div class="chat-input-area mt-3">
+                <input type="text" id="chatInput" placeholder="Ask a question..." />
+                <button class="btn btn-primary" id="chatSendBtn">
+                  <i data-lucide="send"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+          
         </div>
       </main>
     </div>

@@ -24,10 +24,10 @@
       
       <h2 class="card-title mb-4 text-left" style="font-size: 1.25rem;">Welcome back</h2>
       
-      <form action="index.html" class="text-left">
+      <form action="index.html" id="login-form" class="text-left">
         <div class="form-group">
           <label class="form-label">Email</label>
-          <input type="email" class="form-input" placeholder="you@example.com" required />
+          <input type="email" id="login-email" class="form-input" placeholder="you@example.com" required />
         </div>
         
         <div class="form-group mb-4">
@@ -35,7 +35,7 @@
             <label class="form-label mb-0">Password</label>
             <a href="#" class="text-primary" style="font-size: 0.75rem;">Forgot password?</a>
           </div>
-          <input type="password" class="form-input" placeholder="••••••••" required />
+          <input type="password" id="login-password" class="form-input" placeholder="••••••••" required />
         </div>
         
         <button type="submit" class="btn btn-primary btn-block" style="padding: 0.75rem;">Sign In</button>

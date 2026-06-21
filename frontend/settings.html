@@ -78,21 +78,21 @@
             <!-- Profile Settings -->
             <div class="card">
               <h3 class="card-title pb-3 border-b mb-4">Profile Information</h3>
-              <form>
+              <form id="profile-form">
                 <div class="form-group">
                   <label class="form-label">Full Name</label>
-                  <input type="text" class="form-input" value="Placify User" />
+                  <input type="text" id="profile-name" class="form-input" value="" />
                 </div>
                 <div class="form-group">
                   <label class="form-label">Email Address</label>
-                  <input type="email" class="form-input" value="user@placify.dev" />
+                  <input type="email" id="profile-email" class="form-input" value="" />
                 </div>
                 <div class="form-group">
                   <label class="form-label">Title / Headline</label>
-                  <input type="text" class="form-input" value="Software Engineer" />
+                  <input type="text" id="profile-title" class="form-input" value="" />
                 </div>
                 <div class="form-group mt-4">
-                  <button type="button" class="btn btn-primary">Save Changes</button>
+                  <button type="submit" class="btn btn-primary">Save Changes</button>
                 </div>
               </form>
             </div>
@@ -100,14 +100,14 @@
             <!-- Preferences -->
             <div class="card">
               <h3 class="card-title pb-3 border-b mb-4">Preferences</h3>
-              <form>
+              <form id="preferences-form">
                 <div class="form-group flex justify-between items-center" style="flex-direction: row;">
                   <label class="form-label mb-0">Email Notifications</label>
-                  <input type="checkbox" checked />
+                  <input type="checkbox" id="pref-email" />
                 </div>
                 <div class="form-group flex justify-between items-center" style="flex-direction: row; margin-top: 1rem;">
                   <label class="form-label mb-0">Public Profile</label>
-                  <input type="checkbox" checked />
+                  <input type="checkbox" id="pref-public" />
                 </div>
                 <div class="form-group flex justify-between items-center" style="flex-direction: row; margin-top: 1rem;">
                   <label class="form-label mb-0">Dark Mode</label>

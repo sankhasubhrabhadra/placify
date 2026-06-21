@@ -1,0 +1,755 @@
+{
+  "roadmaps": [
+    {
+      "id": "dsa",
+      "title": "Data Structures & Algorithms",
+      "description": "Master the core DS&A concepts needed to ace FAANG interviews",
+      "icon": "cpu",
+      "color": "#FFA116",
+      "sections": [
+        {
+          "id": "arrays-strings",
+          "title": "Arrays & Strings",
+          "nodes": [
+            {
+              "id": "array-basics",
+              "title": "Array Basics",
+              "status": "done",
+              "description": "Learn array creation, indexing, slicing, and common operations. Understand time complexities.",
+              "resources": [
+                "LeetCode Arrays 101",
+                "Python Lists Documentation"
+              ]
+            },
+            {
+              "id": "two-pointers",
+              "title": "Two Pointers",
+              "status": "done",
+              "description": "Use two indices moving toward each other or in the same direction to solve problems in O(n).",
+              "resources": [
+                "LeetCode Two Pointers Explore Card"
+              ]
+            },
+            {
+              "id": "sliding-window",
+              "title": "Sliding Window",
+              "status": "in-progress",
+              "description": "Maintain a window of elements that expands/shrinks. Great for substring and subarray problems.",
+              "resources": [
+                "Sliding Window Technique Article"
+              ]
+            },
+            {
+              "id": "prefix-sum",
+              "title": "Prefix Sum",
+              "status": "todo",
+              "description": "Pre-compute cumulative sums for O(1) range queries instead of O(n) each time.",
+              "resources": []
+            }
+          ]
+        },
+        {
+          "id": "linked-lists",
+          "title": "Linked Lists",
+          "nodes": [
+            {
+              "id": "singly-linked",
+              "title": "Singly Linked List",
+              "status": "done",
+              "description": "Nodes with value and next pointer. Understand traversal, insertion, deletion.",
+              "resources": [
+                "Visualgo Linked List"
+              ]
+            },
+            {
+              "id": "doubly-linked",
+              "title": "Doubly Linked List",
+              "status": "done",
+              "description": "Nodes with prev and next pointers. Used in LRU Cache and deque implementations.",
+              "resources": []
+            },
+            {
+              "id": "fast-slow-pointers",
+              "title": "Fast & Slow Pointers",
+              "status": "in-progress",
+              "description": "Floyd's cycle detection. Fast pointer moves 2x speed. Used for cycle detection and finding midpoints.",
+              "resources": [
+                "Floyd's Algorithm"
+              ]
+            },
+            {
+              "id": "reverse-linked-list",
+              "title": "Reverse a Linked List",
+              "status": "todo",
+              "description": "Iterative and recursive approaches to reversing a singly linked list in-place.",
+              "resources": []
+            }
+          ]
+        },
+        {
+          "id": "stacks-queues",
+          "title": "Stacks & Queues",
+          "nodes": [
+            {
+              "id": "stack",
+              "title": "Stack (LIFO)",
+              "status": "done",
+              "description": "Last In First Out. Used for DFS, undo operations, and balanced brackets problems.",
+              "resources": [
+                "Stack in Python"
+              ]
+            },
+            {
+              "id": "queue",
+              "title": "Queue (FIFO)",
+              "status": "done",
+              "description": "First In First Out. Used for BFS, scheduling, and producer-consumer problems.",
+              "resources": [
+                "Queue with deque"
+              ]
+            },
+            {
+              "id": "monotonic-stack",
+              "title": "Monotonic Stack",
+              "status": "todo",
+              "description": "Stack that maintains a monotonic order. Solves Next Greater Element and histogram problems.",
+              "resources": []
+            }
+          ]
+        },
+        {
+          "id": "trees-graphs",
+          "title": "Trees & Graphs",
+          "nodes": [
+            {
+              "id": "binary-trees",
+              "title": "Binary Trees",
+              "status": "in-progress",
+              "description": "Tree where each node has at most 2 children. Learn traversals: inorder, preorder, postorder.",
+              "resources": [
+                "Binary Tree Visualgo"
+              ]
+            },
+            {
+              "id": "bst",
+              "title": "Binary Search Tree",
+              "status": "todo",
+              "description": "BST property: left < node < right. Enables O(log n) search, insert, delete.",
+              "resources": []
+            },
+            {
+              "id": "dfs",
+              "title": "Depth-First Search",
+              "status": "todo",
+              "description": "Explores as deep as possible before backtracking. Uses stack (iterative) or recursion.",
+              "resources": []
+            },
+            {
+              "id": "bfs",
+              "title": "Breadth-First Search",
+              "status": "todo",
+              "description": "Explores level by level. Uses a queue. Perfect for shortest path in unweighted graphs.",
+              "resources": []
+            },
+            {
+              "id": "dijkstra",
+              "title": "Dijkstra's Algorithm",
+              "status": "todo",
+              "description": "Finds shortest path in weighted graphs with non-negative edges using a priority queue.",
+              "resources": []
+            }
+          ]
+        },
+        {
+          "id": "dynamic-programming",
+          "title": "Dynamic Programming",
+          "nodes": [
+            {
+              "id": "1d-dp",
+              "title": "1D Dynamic Programming",
+              "status": "todo",
+              "description": "Fibonacci, climbing stairs, house robber. Build solution from smaller subproblems.",
+              "resources": [
+                "DP for Beginners"
+              ]
+            },
+            {
+              "id": "2d-dp",
+              "title": "2D Dynamic Programming",
+              "status": "todo",
+              "description": "Unique paths, edit distance, longest common subsequence using a 2D table.",
+              "resources": []
+            },
+            {
+              "id": "knapsack",
+              "title": "0/1 Knapsack",
+              "status": "todo",
+              "description": "Classic DP: maximize value within weight constraint. Each item can only be used once.",
+              "resources": []
+            },
+            {
+              "id": "lcs",
+              "title": "Longest Common Subsequence",
+              "status": "todo",
+              "description": "Find the longest sequence present in both strings. Foundation for edit distance.",
+              "resources": []
+            }
+          ]
+        },
+        {
+          "id": "sorting-searching",
+          "title": "Sorting & Searching",
+          "nodes": [
+            {
+              "id": "basic-sorts",
+              "title": "Bubble / Selection / Insertion Sort",
+              "status": "done",
+              "description": "O(n^2) simple sorting algorithms. Important to understand fundamentals before advanced sorts.",
+              "resources": []
+            },
+            {
+              "id": "merge-sort",
+              "title": "Merge Sort",
+              "status": "done",
+              "description": "Divide and conquer O(n log n) sort. Stable, used for external sorting and linked lists.",
+              "resources": []
+            },
+            {
+              "id": "quick-sort",
+              "title": "Quick Sort",
+              "status": "in-progress",
+              "description": "Partition-based O(n log n) average sort. In-place but unstable. Pivot selection matters.",
+              "resources": []
+            },
+            {
+              "id": "binary-search-adv",
+              "title": "Binary Search Variants",
+              "status": "todo",
+              "description": "Search on answer, rotated arrays, first/last occurrence. O(log n) is the goal.",
+              "resources": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "frontend",
+      "title": "Frontend Development",
+      "description": "Build modern, responsive web apps from HTML basics to React",
+      "icon": "monitor",
+      "color": "#00B8A3",
+      "sections": [
+        {
+          "id": "html-fundamentals",
+          "title": "HTML Fundamentals",
+          "nodes": [
+            {
+              "id": "html-basics",
+              "title": "HTML Basics & Semantics",
+              "status": "done",
+              "description": "Tags, attributes, semantic elements (header, main, section, article, footer). Document structure.",
+              "resources": [
+                "MDN HTML Guide"
+              ]
+            },
+            {
+              "id": "html-forms",
+              "title": "Forms & Inputs",
+              "status": "done",
+              "description": "Form elements, input types, validation attributes, accessibility with labels and ARIA.",
+              "resources": [
+                "MDN Forms"
+              ]
+            },
+            {
+              "id": "html-accessibility",
+              "title": "Accessibility (a11y)",
+              "status": "in-progress",
+              "description": "WCAG guidelines, ARIA roles, screen reader support, keyboard navigation.",
+              "resources": [
+                "Web Accessibility Guide"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "css-styling",
+          "title": "CSS & Styling",
+          "nodes": [
+            {
+              "id": "css-basics",
+              "title": "CSS Fundamentals",
+              "status": "done",
+              "description": "Selectors, specificity, box model, colors, typography, and the cascade.",
+              "resources": [
+                "CSS Tricks"
+              ]
+            },
+            {
+              "id": "flexbox",
+              "title": "Flexbox",
+              "status": "done",
+              "description": "One-dimensional layout model. Master flex-direction, justify-content, align-items.",
+              "resources": [
+                "Flexbox Froggy"
+              ]
+            },
+            {
+              "id": "css-grid",
+              "title": "CSS Grid",
+              "status": "done",
+              "description": "Two-dimensional layout. Grid-template-columns, grid-template-rows, grid areas.",
+              "resources": [
+                "CSS Grid Garden"
+              ]
+            },
+            {
+              "id": "responsive-design",
+              "title": "Responsive Design",
+              "status": "in-progress",
+              "description": "Media queries, mobile-first approach, viewport units, responsive images.",
+              "resources": []
+            }
+          ]
+        },
+        {
+          "id": "javascript-core",
+          "title": "JavaScript Core",
+          "nodes": [
+            {
+              "id": "js-basics",
+              "title": "JS Fundamentals",
+              "status": "done",
+              "description": "Variables (let/const/var), data types, operators, control flow, functions.",
+              "resources": [
+                "javascript.info"
+              ]
+            },
+            {
+              "id": "js-dom",
+              "title": "DOM Manipulation",
+              "status": "done",
+              "description": "querySelector, addEventListener, createElement, innerHTML, classList.",
+              "resources": []
+            },
+            {
+              "id": "js-async",
+              "title": "Async JS (Promises, async/await)",
+              "status": "in-progress",
+              "description": "Event loop, callbacks, Promises, async/await, fetch API.",
+              "resources": [
+                "JavaScript Event Loop"
+              ]
+            },
+            {
+              "id": "js-es6",
+              "title": "ES6+ Features",
+              "status": "in-progress",
+              "description": "Arrow functions, destructuring, spread/rest, modules, template literals, optional chaining.",
+              "resources": []
+            },
+            {
+              "id": "js-closures",
+              "title": "Closures & Scope",
+              "status": "todo",
+              "description": "Lexical scope, closure, hoisting, IIFE patterns, this keyword.",
+              "resources": []
+            }
+          ]
+        },
+        {
+          "id": "react",
+          "title": "React",
+          "nodes": [
+            {
+              "id": "react-basics",
+              "title": "React Fundamentals",
+              "status": "in-progress",
+              "description": "JSX, components, props, state, and the virtual DOM. Create your first component.",
+              "resources": [
+                "React Official Docs"
+              ]
+            },
+            {
+              "id": "react-hooks",
+              "title": "Hooks (useState, useEffect)",
+              "status": "todo",
+              "description": "State management with useState, side effects with useEffect, useRef, useCallback.",
+              "resources": []
+            },
+            {
+              "id": "react-context",
+              "title": "Context & State Management",
+              "status": "todo",
+              "description": "Context API for global state, useReducer for complex state, intro to Zustand/Redux.",
+              "resources": []
+            },
+            {
+              "id": "react-router",
+              "title": "React Router",
+              "status": "todo",
+              "description": "Client-side routing, Route, Link, useNavigate, useParams, nested routes.",
+              "resources": []
+            }
+          ]
+        },
+        {
+          "id": "typescript",
+          "title": "TypeScript",
+          "nodes": [
+            {
+              "id": "ts-basics",
+              "title": "TypeScript Basics",
+              "status": "todo",
+              "description": "Static typing, interfaces, type aliases, union types, generics basics.",
+              "resources": [
+                "TypeScript Handbook"
+              ]
+            },
+            {
+              "id": "ts-advanced",
+              "title": "Advanced Types",
+              "status": "todo",
+              "description": "Generics, utility types (Partial, Pick, Omit), conditional types, mapped types.",
+              "resources": []
+            },
+            {
+              "id": "ts-react",
+              "title": "TypeScript with React",
+              "status": "todo",
+              "description": "Typing props, events, hooks, and API responses in a React application.",
+              "resources": []
+            }
+          ]
+        },
+        {
+          "id": "testing-fe",
+          "title": "Testing",
+          "nodes": [
+            {
+              "id": "jest",
+              "title": "Unit Testing with Jest",
+              "status": "todo",
+              "description": "Write unit tests, use matchers, mock functions and modules.",
+              "resources": [
+                "Jest Documentation"
+              ]
+            },
+            {
+              "id": "react-testing",
+              "title": "React Testing Library",
+              "status": "todo",
+              "description": "Test UI from the user's perspective. render, screen, userEvent, queries.",
+              "resources": []
+            },
+            {
+              "id": "e2e-testing",
+              "title": "E2E Testing with Playwright",
+              "status": "todo",
+              "description": "Browser automation for end-to-end testing across Chromium, Firefox, and WebKit.",
+              "resources": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "backend",
+      "title": "Backend Development",
+      "description": "Build scalable REST APIs with Python, databases, and deployment",
+      "icon": "server",
+      "color": "#FF6B6B",
+      "sections": [
+        {
+          "id": "python-basics",
+          "title": "Python Fundamentals",
+          "nodes": [
+            {
+              "id": "python-core",
+              "title": "Python Core",
+              "status": "done",
+              "description": "Data types, control flow, functions, comprehensions, OOP, error handling.",
+              "resources": [
+                "Python Official Tutorial"
+              ]
+            },
+            {
+              "id": "python-stdlib",
+              "title": "Standard Library",
+              "status": "done",
+              "description": "collections, itertools, functools, pathlib, datetime, json modules.",
+              "resources": []
+            },
+            {
+              "id": "python-packages",
+              "title": "Package Management",
+              "status": "done",
+              "description": "pip, virtual environments (venv), requirements.txt, pyproject.toml.",
+              "resources": []
+            }
+          ]
+        },
+        {
+          "id": "rest-apis",
+          "title": "REST APIs",
+          "nodes": [
+            {
+              "id": "http-basics",
+              "title": "HTTP & REST Principles",
+              "status": "done",
+              "description": "HTTP methods, status codes, headers, REST constraints, CRUD operations.",
+              "resources": []
+            },
+            {
+              "id": "flask",
+              "title": "Flask Framework",
+              "status": "done",
+              "description": "Routes, blueprints, request/response, middleware, Jinja2 templates.",
+              "resources": [
+                "Flask Documentation"
+              ]
+            },
+            {
+              "id": "fastapi",
+              "title": "FastAPI",
+              "status": "in-progress",
+              "description": "Async Python API framework with automatic OpenAPI docs, Pydantic validation.",
+              "resources": [
+                "FastAPI Docs"
+              ]
+            },
+            {
+              "id": "api-security",
+              "title": "API Security",
+              "status": "todo",
+              "description": "JWT authentication, OAuth2, rate limiting, CORS, input validation.",
+              "resources": []
+            }
+          ]
+        },
+        {
+          "id": "databases",
+          "title": "Databases",
+          "nodes": [
+            {
+              "id": "sql-basics",
+              "title": "SQL Fundamentals",
+              "status": "done",
+              "description": "SELECT, INSERT, UPDATE, DELETE, JOINs, GROUP BY, indexes.",
+              "resources": [
+                "SQLZoo"
+              ]
+            },
+            {
+              "id": "postgresql",
+              "title": "PostgreSQL",
+              "status": "in-progress",
+              "description": "Production-grade RDBMS. Advanced queries, CTEs, window functions, JSON support.",
+              "resources": []
+            },
+            {
+              "id": "orm",
+              "title": "ORMs (SQLAlchemy)",
+              "status": "todo",
+              "description": "Map Python classes to database tables. Sessions, relationships, migrations with Alembic.",
+              "resources": []
+            },
+            {
+              "id": "nosql",
+              "title": "NoSQL (MongoDB / Redis)",
+              "status": "todo",
+              "description": "Document databases with MongoDB, in-memory cache/message broker with Redis.",
+              "resources": []
+            }
+          ]
+        },
+        {
+          "id": "auth",
+          "title": "Authentication",
+          "nodes": [
+            {
+              "id": "sessions-cookies",
+              "title": "Sessions & Cookies",
+              "status": "done",
+              "description": "Stateful auth with server-side sessions, cookie security flags (HTTPOnly, Secure, SameSite).",
+              "resources": []
+            },
+            {
+              "id": "jwt",
+              "title": "JWT Authentication",
+              "status": "in-progress",
+              "description": "Stateless auth with JSON Web Tokens. Access & refresh token pattern.",
+              "resources": [
+                "JWT.io"
+              ]
+            },
+            {
+              "id": "oauth2",
+              "title": "OAuth2 & Social Login",
+              "status": "todo",
+              "description": "Delegate authentication to Google, GitHub, etc. Authorization code flow.",
+              "resources": []
+            }
+          ]
+        },
+        {
+          "id": "deployment",
+          "title": "Docker & Deployment",
+          "nodes": [
+            {
+              "id": "docker",
+              "title": "Docker Basics",
+              "status": "todo",
+              "description": "Dockerfile, images, containers, volumes, docker-compose for multi-service apps.",
+              "resources": [
+                "Docker Getting Started"
+              ]
+            },
+            {
+              "id": "ci-cd",
+              "title": "CI/CD Pipelines",
+              "status": "todo",
+              "description": "GitHub Actions for automated testing and deployment. Build, test, deploy on push.",
+              "resources": []
+            },
+            {
+              "id": "cloud-deploy",
+              "title": "Cloud Deployment (AWS/GCP)",
+              "status": "todo",
+              "description": "Deploy to EC2/Cloud Run, configure environment variables, SSL with Let's Encrypt.",
+              "resources": []
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "system-design",
+      "title": "System Design",
+      "description": "Design large-scale distributed systems for senior engineering interviews",
+      "icon": "layers",
+      "color": "#FFC857",
+      "sections": [
+        {
+          "id": "fundamentals-sd",
+          "title": "Fundamentals",
+          "nodes": [
+            {
+              "id": "scalability",
+              "title": "Scalability",
+              "status": "in-progress",
+              "description": "Vertical vs horizontal scaling, stateless services, session management at scale.",
+              "resources": [
+                "Scalability Lecture - Harvard"
+              ]
+            },
+            {
+              "id": "load-balancing",
+              "title": "Load Balancing",
+              "status": "done",
+              "description": "Round-robin, least connections, consistent hashing. Layer 4 vs Layer 7 load balancers.",
+              "resources": []
+            },
+            {
+              "id": "caching",
+              "title": "Caching",
+              "status": "todo",
+              "description": "Cache-aside, write-through, write-back patterns. CDN, Redis, Memcached. Eviction policies.",
+              "resources": []
+            }
+          ]
+        },
+        {
+          "id": "databases-at-scale",
+          "title": "Databases at Scale",
+          "nodes": [
+            {
+              "id": "sharding",
+              "title": "Database Sharding",
+              "status": "todo",
+              "description": "Horizontal partitioning across multiple DB instances. Range, hash, directory-based sharding.",
+              "resources": []
+            },
+            {
+              "id": "replication",
+              "title": "Replication",
+              "status": "todo",
+              "description": "Primary-replica setup for read scaling and fault tolerance. Synchronous vs async replication.",
+              "resources": []
+            },
+            {
+              "id": "cap-theorem",
+              "title": "CAP Theorem",
+              "status": "todo",
+              "description": "A distributed system can guarantee at most 2 of: Consistency, Availability, Partition tolerance.",
+              "resources": [
+                "CAP Theorem Explained"
+              ]
+            }
+          ]
+        },
+        {
+          "id": "real-world-systems",
+          "title": "Real-World System Design",
+          "nodes": [
+            {
+              "id": "url-shortener",
+              "title": "Design URL Shortener",
+              "status": "todo",
+              "description": "Base62 encoding, redirect flow, analytics, rate limiting, DB schema for billions of URLs.",
+              "resources": []
+            },
+            {
+              "id": "design-twitter",
+              "title": "Design Twitter",
+              "status": "todo",
+              "description": "Feed generation (push vs pull), fanout on write vs read, celebrity problem, media storage.",
+              "resources": []
+            },
+            {
+              "id": "design-netflix",
+              "title": "Design Netflix",
+              "status": "todo",
+              "description": "CDN for video streaming, adaptive bitrate, content recommendation, microservices architecture.",
+              "resources": []
+            },
+            {
+              "id": "design-whatsapp",
+              "title": "Design WhatsApp",
+              "status": "todo",
+              "description": "Message delivery guarantees, WebSockets for real-time, end-to-end encryption, presence system.",
+              "resources": []
+            }
+          ]
+        },
+        {
+          "id": "microservices",
+          "title": "Microservices",
+          "nodes": [
+            {
+              "id": "microservices-basics",
+              "title": "Microservices vs Monolith",
+              "status": "todo",
+              "description": "Trade-offs of microservices: deployment complexity vs independent scaling and deployment.",
+              "resources": []
+            },
+            {
+              "id": "api-gateway",
+              "title": "API Gateway & Service Mesh",
+              "status": "todo",
+              "description": "Single entry point for clients. Handles auth, rate limiting, routing. Istio, Kong.",
+              "resources": []
+            },
+            {
+              "id": "message-queues",
+              "title": "Message Queues (Kafka, RabbitMQ)",
+              "status": "todo",
+              "description": "Async communication between services, event-driven architecture, guaranteed delivery.",
+              "resources": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Resume Scanner - Placify</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style-additions.css" />
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="layout-wrapper">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <i data-lucide="code-2" class="text-primary mr-2"></i>
+        Placify
+      </div>
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="problems.html" class="nav-item">
+          <i data-lucide="code-2"></i>
+          <span>Problems</span>
+        </a>
+        <a href="learning.html" class="nav-item">
+          <i data-lucide="book-open"></i>
+          <span>Learning Paths</span>
+        </a>
+        <a href="interviews.html" class="nav-item">
+          <i data-lucide="message-square"></i>
+          <span>Mock Interviews</span>
+        </a>
+        <a href="jobs.html" class="nav-item active">
+          <i data-lucide="file-search"></i>
+          <span>Resume Scanner</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="settings.html" class="nav-item">
+          <i data-lucide="settings"></i>
+          <span>Settings</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
+    <div class="main-content">
+      
+      <!-- Top Nav -->
+      <header class="top-nav">
+        <div class="search-bar">
+          <i data-lucide="search" class="text-secondary"></i>
+          <input type="text" placeholder="Search problems, articles, or users..." />
+        </div>
+        <div class="user-actions">
+          <button class="icon-btn">
+            <i data-lucide="bell"></i>
+          </button>
+          <a href="login.html" class="avatar" style="text-decoration: none;">P</a>
+        </div>
+      </header>
+
+      <!-- Content -->
+      <main class="content-area">
+        <div class="dashboard-grid">
+          <div class="flex justify-between items-center mb-4">
+            <h2 style="font-size: 1.5rem; font-weight: 600;">Resume Scanner</h2>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4">
+            <div class="card">
+              <h3 class="card-title mb-4">Upload or Paste Your Resume</h3>
+              <p class="text-secondary" style="font-size: 0.9rem; margin-bottom: 1.5rem;">
+                Supports PDF and plain text files. The scanner analyzes your skills, experience, and overall fit.
+              </p>
+
+              <div class="flex flex-col gap-4 mb-4">
+                <div>
+                  <label for="resumeFile" class="form-label">Upload a file</label>
+                  <input type="file" id="resumeFile" accept=".pdf,.txt,.docx" style="width: 100%; margin-top: 0.5rem;" />
+                </div>
+                <div>
+                  <label for="resumeText" class="form-label">Or paste text here</label>
+                  <textarea id="resumeText" rows="8" class="form-input" style="width: 100%; margin-top: 0.5rem;" placeholder="Paste your resume text here..."></textarea>
+                </div>
+                <button id="parseBtn" class="btn btn-primary">
+                  <i data-lucide="scan" style="width: 18px; height: 18px; margin-right: 0.5rem;"></i>
+                  Scan Resume
+                </button>
+              </div>
+
+              <div id="scanResults"></div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+  <script>
+    // Override the renderResults function to make it look better
+    (function() {
+      // Find the original renderResults from script.js and replace it
+      // Wait for the DOM to load, then add a new renderResults function
+      window.renderResults = function(result) {
+        const resultsEl = document.getElementById('scanResults');
+        resultsEl.innerHTML = '';
+        
+        const wrap = document.createElement('div');
+        wrap.className = 'card';
+        wrap.style.marginTop = '1.5rem';
+        
+        const decisionClass = result.explanation.decision === 'SHORTLISTED' ? 'decision-shortlisted' : 'decision-rejected';
+        
+        wrap.innerHTML = `
+          <div class="flex justify-between items-center mb-4 pb-4" style="border-bottom: 1px solid var(--border-color);">
+            <div>
+              <h4 style="font-weight: 600; font-size: 1.25rem; margin-bottom: 0.25rem;">Scan Results</h4>
+              <span class="text-secondary" style="font-size: 0.875rem;">Here's your analysis</span>
+            </div>
+            <span class="decision-badge ${decisionClass}">${result.explanation.decision}</span>
+          </div>
+          
+          <div class="flex flex-col gap-4 mb-4">
+            <div class="result-score">${result.score}/100</div>
+            
+            <div>
+              <h5 class="mb-2" style="font-weight: 600;">Detected Skills</h5>
+              <div class="flex flex-wrap gap-2">
+                ${result.skills.length ? result.skills.map(skill => `<span class="badge"><i data-lucide="check" class="text-primary badge-icon"></i>${skill}</span>`).join('') : '<span class="text-secondary">No skills detected</span>'}
+              </div>
+            </div>
+            
+            <div class="grid" style="grid-template-columns: 1fr 1fr; gap: 1rem;">
+              <div>
+                <h5 class="mb-2" style="font-weight: 600;">Experience</h5>
+                <p class="text-secondary">${result.experience} years</p>
+              </div>
+              <div>
+                <h5 class="mb-2" style="font-weight: 600;">Projects</h5>
+                <p class="text-secondary">${result.projects} projects</p>
+              </div>
+            </div>
+            
+            <div>
+              <h5 class="mb-2" style="font-weight: 600;">Notes</h5>
+              <ul class="text-secondary" style="margin-left: 1.25rem;">
+                ${result.explanation.reasons.map(reason => `<li style="margin-bottom:0.25rem;">${reason}</li>`).join('')}
+              </ul>
+            </div>
+          </div>
+        `;
+        
+        resultsEl.appendChild(wrap);
+        lucide.createIcons(); // Re-initialize lucide icons for new elements
+      };
+    })();
+  </script>
+</body>
+</html>

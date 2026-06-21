@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Problems - Placify</title>
+  <meta name="description" content="Practice 30+ coding problems in a LeetCode-style environment with AI hints."/>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style-additions.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/theme/monokai.min.css">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/python/python.min.js"></script>
+  <style>
+    /* ── Reset & base ── */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      --bg: #1A1A1A; --surface: #262626; --card: #2D2D2D;
+      --border: #3A3A3A; --accent: #FFA116; --success: #00B8A3;
+      --warning: #FFC857; --error: #FF6B6B; --txt: #FFFFFF; --txt2: #B0B0B0;
+      --radius: 6px; --mono: 'JetBrains Mono', monospace;
+    }
+    body { background: var(--bg); color: var(--txt); font-family: 'Inter', sans-serif; overflow: hidden; }
+
+    /* ── Layout ── */
+    .app { display: flex; height: 100vh; overflow: hidden; }
+    .sidebar { width: 220px; background: var(--surface); border-right: 1px solid var(--border); display: flex; flex-direction: column; flex-shrink: 0; }
+    .sidebar-header { height: 56px; display: flex; align-items: center; gap: 8px; padding: 0 20px; border-bottom: 1px solid var(--border); font-weight: 700; font-size: 1.1rem; }
+    .sidebar-header i { color: var(--accent); width: 20px; height: 20px; }
+    .sidebar-nav { flex: 1; padding: 12px 8px; display: flex; flex-direction: column; gap: 2px; }
+    .nav-item { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: var(--radius); color: var(--txt2); font-size: 0.875rem; font-weight: 500; text-decoration: none; transition: all 0.15s; }
+    .nav-item:hover { background: var(--card); color: var(--txt); }
+    .nav-item.active { background: var(--card); color: var(--txt); border-left: 3px solid var(--accent); border-radius: 0 var(--radius) var(--radius) 0; }
+    .nav-item i { width: 16px; height: 16px; flex-shrink: 0; }
+    .sidebar-footer { padding: 12px 8px; border-top: 1px solid var(--border); }
+
+    /* ── Main workspace ── */
+    .workspace { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+
+    /* ── Top bar ── */
+    .topbar { height: 48px; background: var(--surface); border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; padding: 0 16px; flex-shrink: 0; }
+    .topbar-left { display: flex; align-items: center; gap: 12px; }
+    .topbar-right { display: flex; align-items: center; gap: 12px; }
+    .solve-stats { display: flex; gap: 16px; font-size: 0.8rem; }
+    .stat-chip { display: flex; align-items: center; gap: 5px; padding: 3px 8px; border-radius: 20px; font-weight: 600; font-size: 0.75rem; }
+    .stat-chip.easy   { background: rgba(0,184,163,0.12); color: var(--success); }
+    .stat-chip.medium { background: rgba(255,200,87,0.12); color: var(--warning); }
+    .stat-chip.hard   { background: rgba(255,107,107,0.12); color: var(--error); }
+    .topbar-title { font-weight: 700; font-size: 0.9rem; color: var(--accent); }
+
+    /* ── Three-panel ── */
+    .panels { flex: 1; display: flex; overflow: hidden; }
+
+    /* ── Problem List Panel ── */
+    .panel-list { width: 300px; flex-shrink: 0; display: flex; flex-direction: column; border-right: 1px solid var(--border); background: var(--surface); }
+    .panel-list-header { padding: 12px; border-bottom: 1px solid var(--border); display: flex; flex-direction: column; gap: 8px; }
+    .search-input { width: 100%; background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 7px 10px; color: var(--txt); font-size: 0.8rem; outline: none; transition: border-color 0.15s; }
+    .search-input:focus { border-color: var(--accent); }
+    .filter-tabs { display: flex; gap: 4px; }
+    .filter-tab { flex: 1; padding: 5px 0; text-align: center; font-size: 0.75rem; font-weight: 600; border-radius: var(--radius); border: 1px solid var(--border); background: transparent; color: var(--txt2); cursor: pointer; transition: all 0.15s; }
+    .filter-tab:hover { color: var(--txt); border-color: #555; }
+    .filter-tab.active { background: var(--accent); color: #000; border-color: var(--accent); }
+    .filter-tab.easy.active   { background: var(--success); border-color: var(--success); }
+    .filter-tab.medium.active { background: var(--warning); border-color: var(--warning); }
+    .filter-tab.hard.active   { background: var(--error);   border-color: var(--error);   }
+    .problem-list-body { flex: 1; overflow-y: auto; }
+    .problem-row { display: flex; align-items: center; gap: 10px; padding: 10px 14px; cursor: pointer; border-bottom: 1px solid rgba(255,255,255,0.04); transition: background 0.1s; font-size: 0.82rem; position: relative; }
+    .problem-row:hover { background: rgba(255,255,255,0.04); }
+    .problem-row.active { background: rgba(255,161,22,0.08); border-left: 3px solid var(--accent); padding-left: 11px; }
+    .problem-num { color: var(--txt2); min-width: 28px; font-size: 0.75rem; font-family: var(--mono); }
+    .problem-title-text { flex: 1; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .problem-title-text.solved { color: var(--success); }
+    .diff-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+    .diff-dot.easy   { background: var(--success); }
+    .diff-dot.medium { background: var(--warning); }
+    .diff-dot.hard   { background: var(--error);   }
+    .solved-check { color: var(--success); flex-shrink: 0; }
+    .acceptance-txt { color: var(--txt2); font-size: 0.7rem; min-width: 36px; text-align: right; }
+
+    /* ── Description Panel ── */
+    .panel-desc { flex: 1; display: flex; flex-direction: column; border-right: 1px solid var(--border); min-width: 0; }
+    .panel-desc-tabs { display: flex; border-bottom: 1px solid var(--border); background: var(--surface); flex-shrink: 0; }
+    .desc-tab { padding: 11px 20px; font-size: 0.82rem; font-weight: 600; cursor: pointer; color: var(--txt2); border-bottom: 2px solid transparent; transition: all 0.15s; }
+    .desc-tab:hover { color: var(--txt); }
+    .desc-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .panel-desc-body { flex: 1; overflow-y: auto; padding: 20px 24px; }
+    .empty-state { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; gap: 16px; color: var(--txt2); }
+    .empty-state i { width: 48px; height: 48px; opacity: 0.3; }
+    .empty-state p { font-size: 0.9rem; }
+    .prob-title { font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; }
+    .prob-badges { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+    .badge-diff { padding: 3px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; }
+    .badge-diff.easy   { background: rgba(0,184,163,0.15);  color: var(--success); }
+    .badge-diff.medium { background: rgba(255,200,87,0.15);  color: var(--warning); }
+    .badge-diff.hard   { background: rgba(255,107,107,0.15); color: var(--error); }
+    .badge-tag { padding: 3px 10px; border-radius: 20px; font-size: 0.72rem; background: rgba(255,255,255,0.06); color: var(--txt2); border: 1px solid var(--border); }
+    .prob-desc-text { font-size: 0.875rem; line-height: 1.75; color: #D0D0D0; margin-bottom: 24px; }
+    .section-label { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--txt2); margin-bottom: 10px; }
+    .example-block { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px 16px; margin-bottom: 12px; font-family: var(--mono); font-size: 0.8rem; line-height: 1.6; }
+    .example-block .ex-label { font-family: 'Inter', sans-serif; font-size: 0.75rem; font-weight: 700; color: var(--accent); margin-bottom: 8px; }
+    .example-block .ex-row { display: flex; gap: 8px; margin-bottom: 3px; }
+    .example-block .ex-key { color: var(--txt2); min-width: 80px; }
+    .example-block .ex-val { color: #E0E0E0; }
+    .example-block .ex-exp { color: var(--txt2); font-family: 'Inter', sans-serif; font-size: 0.78rem; margin-top: 6px; }
+    .constraints-list { list-style: none; display: flex; flex-direction: column; gap: 6px; margin-bottom: 24px; }
+    .constraints-list li { font-size: 0.82rem; color: #C0C0C0; padding: 5px 12px; background: var(--bg); border-radius: var(--radius); border-left: 2px solid var(--border); font-family: var(--mono); }
+    .hint-box { background: var(--bg); border: 1px solid var(--border); border-radius: var(--radius); padding: 16px; }
+    .hint-content { filter: blur(5px); user-select: none; font-size: 0.875rem; line-height: 1.7; color: #C0C0C0; transition: filter 0.3s; }
+    .hint-content.revealed { filter: none; user-select: auto; }
+    .reveal-btn { margin-top: 12px; padding: 8px 16px; background: rgba(255,161,22,0.1); border: 1px solid rgba(255,161,22,0.3); color: var(--accent); border-radius: var(--radius); font-size: 0.82rem; font-weight: 600; cursor: pointer; transition: all 0.15s; }
+    .reveal-btn:hover { background: rgba(255,161,22,0.2); }
+    .hint-loading { color: var(--txt2); font-size: 0.85rem; font-style: italic; }
+
+    /* ── Code Editor Panel ── */
+    .panel-editor { width: 45%; flex-shrink: 0; display: flex; flex-direction: column; min-width: 400px; }
+    .editor-topbar { display: flex; align-items: center; justify-content: space-between; padding: 8px 14px; border-bottom: 1px solid var(--border); background: var(--surface); flex-shrink: 0; gap: 10px; }
+    .lang-select { background: var(--bg); border: 1px solid var(--border); color: var(--txt); padding: 5px 10px; border-radius: var(--radius); font-size: 0.78rem; font-family: var(--mono); outline: none; }
+    .editor-btns { display: flex; gap: 8px; align-items: center; }
+    .btn-run { background: rgba(255,200,87,0.1); border: 1px solid rgba(255,200,87,0.4); color: var(--warning); padding: 6px 14px; border-radius: var(--radius); font-size: 0.8rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: all 0.15s; }
+    .btn-run:hover { background: rgba(255,200,87,0.2); }
+    .btn-submit { background: var(--accent); border: none; color: #000; padding: 6px 14px; border-radius: var(--radius); font-size: 0.8rem; font-weight: 700; cursor: pointer; display: flex; align-items: center; gap: 6px; transition: filter 0.15s; }
+    .btn-submit:hover { filter: brightness(1.1); }
+    .btn-hint { background: rgba(0,184,163,0.1); border: 1px solid rgba(0,184,163,0.3); color: var(--success); padding: 6px 12px; border-radius: var(--radius); font-size: 0.78rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 5px; transition: all 0.15s; }
+    .btn-hint:hover { background: rgba(0,184,163,0.2); }
+    .timer { font-family: var(--mono); font-size: 0.8rem; color: var(--txt2); min-width: 50px; }
+    .editor-area { flex: 1; overflow: hidden; display: flex; flex-direction: column; min-height: 0; }
+    .CodeMirror { height: 100% !important; font-size: 13.5px; font-family: var(--mono) !important; line-height: 1.6; }
+    .CodeMirror-scroll { height: 100%; }
+
+    /* ── Test/Output panel ── */
+    .test-panel { height: 220px; flex-shrink: 0; border-top: 1px solid var(--border); display: flex; flex-direction: column; }
+    .test-panel-tabs { display: flex; background: var(--surface); border-bottom: 1px solid var(--border); flex-shrink: 0; align-items: center; justify-content: space-between; padding-right: 12px; }
+    .test-tab { padding: 9px 18px; font-size: 0.8rem; font-weight: 600; cursor: pointer; color: var(--txt2); border-bottom: 2px solid transparent; transition: all 0.15s; }
+    .test-tab:hover { color: var(--txt); }
+    .test-tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+    .status-msg { font-size: 0.8rem; font-weight: 600; padding: 4px 10px; border-radius: 20px; }
+    .status-msg.running { background: rgba(255,200,87,0.1); color: var(--warning); }
+    .status-msg.accepted { background: rgba(0,184,163,0.1); color: var(--success); }
+    .status-msg.wrong { background: rgba(255,107,107,0.1); color: var(--error); }
+    .test-panel-body { flex: 1; overflow-y: auto; padding: 12px 16px; }
+    .test-case-row { display: flex; align-items: flex-start; gap: 12px; padding: 10px 0; border-bottom: 1px solid rgba(255,255,255,0.04); font-size: 0.8rem; }
+    .test-case-row:last-child { border-bottom: none; }
+    .tc-num { min-width: 70px; font-weight: 600; display: flex; align-items: center; gap: 6px; }
+    .tc-pass { color: var(--success); }
+    .tc-fail { color: var(--error); }
+    .tc-fields { flex: 1; display: flex; gap: 20px; flex-wrap: wrap; }
+    .tc-field { display: flex; flex-direction: column; gap: 2px; }
+    .tc-label { font-size: 0.7rem; color: var(--txt2); font-weight: 600; text-transform: uppercase; }
+    .tc-val { font-family: var(--mono); font-size: 0.78rem; background: var(--bg); padding: 2px 8px; border-radius: 3px; color: #DDD; max-width: 200px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .tc-val.error-val { color: var(--error); }
+    .empty-results { color: var(--txt2); font-size: 0.85rem; display: flex; align-items: center; justify-content: center; height: 100%; }
+
+    /* ── Confetti / success ── */
+    @keyframes confetti-fall { to { transform: translateY(110vh) rotate(720deg); opacity: 0; } }
+    .confetti-piece { position: fixed; width: 10px; height: 10px; top: -20px; animation: confetti-fall 1.4s ease-in forwards; border-radius: 2px; z-index: 9999; pointer-events: none; }
+    @keyframes solved-pulse { 0%,100% { box-shadow: 0 0 0 0 rgba(0,184,163,0.4); } 50% { box-shadow: 0 0 0 12px rgba(0,184,163,0); } }
+    .panel-editor.solved-flash { animation: solved-pulse 0.8s ease; }
+
+    /* ── Scrollbars ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: #444; border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: #555; }
+  </style>
+</head>
+<body>
+<div class="app">
+
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <i data-lucide="code-2"></i> Placify
+    </div>
+    <nav class="sidebar-nav">
+      <a href="index.html" class="nav-item"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+      <a href="problems.html" class="nav-item active"><i data-lucide="code-2"></i><span>Problems</span></a>
+      <a href="learning.html" class="nav-item"><i data-lucide="book-open"></i><span>Learning Paths</span></a>
+      <a href="interviews.html" class="nav-item"><i data-lucide="message-square"></i><span>Mock Interviews</span></a>
+      <a href="jobs.html" class="nav-item"><i data-lucide="file-search"></i><span>Resume Scanner</span></a>
+    </nav>
+    <div class="sidebar-footer">
+      <a href="settings.html" class="nav-item"><i data-lucide="settings"></i><span>Settings</span></a>
+    </div>
+  </aside>
+
+  <!-- Workspace -->
+  <div class="workspace">
+
+    <!-- Top bar -->
+    <div class="topbar">
+      <div class="topbar-left">
+        <span class="topbar-title">&#128187; Placify Problems</span>
+        <div class="solve-stats">
+          <span class="stat-chip easy"   id="statEasy">Easy 0/10</span>
+          <span class="stat-chip medium" id="statMedium">Medium 0/12</span>
+          <span class="stat-chip hard"   id="statHard">Hard 0/8</span>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <span class="timer" id="timerDisplay">00:00</span>
+        <a href="login.html" style="width:30px;height:30px;border-radius:50%;background:var(--accent);color:#000;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;text-decoration:none;">P</a>
+      </div>
+    </div>
+
+    <!-- Three panels -->
+    <div class="panels">
+
+      <!-- Panel 1: Problem List -->
+      <div class="panel-list">
+        <div class="panel-list-header">
+          <input class="search-input" id="searchInput" placeholder="&#128269; Search problems..." />
+          <div class="filter-tabs">
+            <button class="filter-tab active" data-diff="all" id="filterAll">All</button>
+            <button class="filter-tab easy"   data-diff="easy">Easy</button>
+            <button class="filter-tab medium" data-diff="medium">Medium</button>
+            <button class="filter-tab hard"   data-diff="hard">Hard</button>
+          </div>
+        </div>
+        <div class="problem-list-body" id="problemListBody">
+          <div style="padding:40px 20px; text-align:center; color:var(--txt2); font-size:0.85rem;">Loading problems...</div>
+        </div>
+      </div>
+
+      <!-- Panel 2: Problem Description -->
+      <div class="panel-desc" id="panelDesc">
+        <div class="panel-desc-tabs">
+          <div class="desc-tab active" data-tab="description" id="tabDesc">Description</div>
+          <div class="desc-tab" data-tab="hints" id="tabHints">Hints</div>
+          <div class="desc-tab" data-tab="solutions" id="tabSols">Solutions</div>
+        </div>
+        <div class="panel-desc-body" id="descBody">
+          <div class="empty-state">
+            <i data-lucide="code-2"></i>
+            <p>Select a problem to start solving</p>
+            <p style="font-size:0.78rem;opacity:0.5;">&#8592; Choose from the list</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Panel 3: Code Editor -->
+      <div class="panel-editor" id="panelEditor">
+        <div class="editor-topbar">
+          <select class="lang-select" id="langSelect">
+            <option value="python">&#127758; Python 3</option>
+          </select>
+          <div class="editor-btns">
+            <button class="btn-hint" id="btnHint" title="Get AI Hint (H)">
+              <i data-lucide="lightbulb" style="width:14px;height:14px;"></i> AI Hint
+            </button>
+            <button class="btn-run" id="btnRun" title="Run Code (Ctrl+Enter)">
+              <i data-lucide="play" style="width:14px;height:14px;"></i> Run
+            </button>
+            <button class="btn-submit" id="btnSubmit" title="Submit Solution">
+              <i data-lucide="send" style="width:14px;height:14px;"></i> Submit
+            </button>
+          </div>
+        </div>
+        <div class="editor-area">
+          <textarea id="codeEditor"></textarea>
+        </div>
+        <div class="test-panel">
+          <div class="test-panel-tabs">
+            <div style="display:flex;">
+              <div class="test-tab active" data-ttab="testcases" id="ttabCases">Test Cases</div>
+              <div class="test-tab" data-ttab="output" id="ttabOutput">Output</div>
+            </div>
+            <span class="status-msg" id="statusMsg" style="display:none;"></span>
+          </div>
+          <div class="test-panel-body" id="testPanelBody">
+            <div class="empty-results">Run your code to see results</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+  lucide.createIcons();
+
+  /* ── State ── */
+  let problems = [], currentProblem = null, currentDiff = 'all', searchQuery = '';
+  let editor, timerInterval, timerSeconds = 0, hintRevealed = false, currentHint = '';
+  let activeDescTab = 'description', activeTestTab = 'testcases';
+
+  /* ── Timer ── */
+  function startTimer() {
+    clearInterval(timerInterval);
+    timerSeconds = 0;
+    timerInterval = setInterval(() => {
+      timerSeconds++;
+      const m = String(Math.floor(timerSeconds/60)).padStart(2,'0');
+      const s = String(timerSeconds%60).padStart(2,'0');
+      document.getElementById('timerDisplay').textContent = `${m}:${s}`;
+    }, 1000);
+  }
+
+  /* ── Init CodeMirror ── */
+  document.addEventListener('DOMContentLoaded', async () => {
+    editor = CodeMirror.fromTextArea(document.getElementById('codeEditor'), {
+      mode: 'python', theme: 'monokai', lineNumbers: true,
+      indentUnit: 4, tabSize: 4, indentWithTabs: false,
+      lineWrapping: false, autoCloseBrackets: true,
+      extraKeys: { 'Ctrl-Enter': () => runCode() }
+    });
+    editor.setValue('# Select a problem to begin\n');
+    await loadProblems();
+  });
+
+  /* ── Load all problems ── */
+  async function loadProblems() {
+    try {
+      const res = await fetch('/api/problems');
+      const data = await res.json();
+      if (data.success) {
+        problems = data.problems;
+        updateStats(data.stats);
+        renderList();
+      }
+    } catch(e) { console.error(e); }
+  }
+
+  function updateStats(stats) {
+    if (!stats) return;
+    document.getElementById('statEasy').textContent   = `Easy ${stats.easy?.solved||0}/${stats.easy?.total||0}`;
+    document.getElementById('statMedium').textContent = `Medium ${stats.medium?.solved||0}/${stats.medium?.total||0}`;
+    document.getElementById('statHard').textContent   = `Hard ${stats.hard?.solved||0}/${stats.hard?.total||0}`;
+  }
+
+  /* ── Render problem list ── */
+  function renderList() {
+    const filtered = problems.filter(p => {
+      const matchDiff = currentDiff === 'all' || p.difficulty === currentDiff;
+      const matchSearch = !searchQuery || p.title.toLowerCase().includes(searchQuery) || (p.tags||[]).join(' ').includes(searchQuery);
+      return matchDiff && matchSearch;
+    });
+    const body = document.getElementById('problemListBody');
+    if (!filtered.length) {
+      body.innerHTML = '<div style="padding:40px 20px;text-align:center;color:var(--txt2);font-size:0.85rem;">No problems found</div>';
+      return;
+    }
+    body.innerHTML = filtered.map(p => `
+      <div class="problem-row${currentProblem?.id === p.id ? ' active' : ''}" onclick="loadProblem(${p.id})">
+        <span class="problem-num">${p.id}</span>
+        <span class="problem-title-text${p.solved?' solved':''}" title="${p.title}">${p.title}</span>
+        <div class="diff-dot ${p.difficulty}" title="${p.difficulty}"></div>
+        <span class="acceptance-txt">${p.acceptance}</span>
+        ${p.solved ? '<i data-lucide="check-circle-2" class="solved-check" style="width:13px;height:13px;"></i>' : ''}
+      </div>
+    `).join('');
+    lucide.createIcons();
+  }
+
+  /* ── Load single problem ── */
+  async function loadProblem(id) {
+    try {
+      const res = await fetch(`/api/problems/${id}`);
+      const data = await res.json();
+      if (!data.success) return;
+      currentProblem = data.problem;
+      hintRevealed = false; currentHint = '';
+      startTimer();
+      renderList();
+      renderDescription();
+      editor.setValue(currentProblem.starter_code || '# Write your solution here\n');
+      editor.focus();
+      showTestCasesTab();
+      document.getElementById('statusMsg').style.display = 'none';
+      document.getElementById('testPanelBody').innerHTML = '<div class="empty-results">Run your code to see results</div>';
+      setDescTab('description');
+    } catch(e) { console.error(e); }
+  }
+
+  /* ── Render description ── */
+  function renderDescription() {
+    if (!currentProblem) return;
+    const p = currentProblem;
+    if (activeDescTab === 'description') {
+      const examplesHtml = (p.examples||[]).map((ex,i) => `
+        <div class="example-block">
+          <div class="ex-label">Example ${i+1}</div>
+          <div class="ex-row"><span class="ex-key">Input:</span><span class="ex-val">${escHtml(ex.input)}</span></div>
+          <div class="ex-row"><span class="ex-key">Output:</span><span class="ex-val">${escHtml(ex.output)}</span></div>
+          ${ex.explanation ? `<div class="ex-exp">&#128161; ${escHtml(ex.explanation)}</div>` : ''}
+        </div>
+      `).join('');
+      const constraintsHtml = (p.constraints||[]).map(c => `<li>${escHtml(c)}</li>`).join('');
+      document.getElementById('descBody').innerHTML = `
+        <div class="prob-title">${p.id}. ${escHtml(p.title)}</div>
+        <div class="prob-badges">
+          <span class="badge-diff ${p.difficulty}">${p.difficulty.charAt(0).toUpperCase()+p.difficulty.slice(1)}</span>
+          ${(p.tags||[]).map(t=>`<span class="badge-tag">${t}</span>`).join('')}
+        </div>
+        <p class="prob-desc-text">${escHtml(p.description)}</p>
+        <div class="section-label">Examples</div>
+        ${examplesHtml}
+        <div class="section-label" style="margin-top:20px;">Constraints</div>
+        <ul class="constraints-list">${constraintsHtml}</ul>
+      `;
+    } else if (activeDescTab === 'hints') {
+      document.getElementById('descBody').innerHTML = `
+        <div class="prob-title" style="font-size:1rem;margin-bottom:16px;">&#128161; Hint for: ${escHtml(p.title)}</div>
+        <div class="hint-box">
+          <div class="hint-content${hintRevealed?' revealed':''}" id="hintContent">
+            ${currentHint || (p.solution_hint ? escHtml(p.solution_hint) : 'No hint available.')}
+          </div>
+          ${!hintRevealed ? `<button class="reveal-btn" onclick="revealHint()">&#128274; Reveal Hint</button>` : ''}
+        </div>
+        <div style="margin-top:16px;padding:12px;background:var(--bg);border-radius:var(--radius);border:1px solid var(--border);">
+          <div style="font-size:0.78rem;color:var(--txt2);margin-bottom:8px;">Get AI-powered hint &#129302;</div>
+          <button class="reveal-btn" onclick="getAIHint()" style="background:rgba(0,184,163,0.1);border-color:rgba(0,184,163,0.3);color:var(--success);">
+            &#10024; Ask AI Coach for a Hint
+          </button>
+          <div id="aiHintResult" style="margin-top:10px;font-size:0.85rem;color:#C0C0C0;line-height:1.7;"></div>
+        </div>
+      `;
+    } else if (activeDescTab === 'solutions') {
+      document.getElementById('descBody').innerHTML = `
+        <div style="text-align:center;padding:48px 20px;color:var(--txt2);">
+          <i data-lucide="lock" style="width:40px;height:40px;opacity:0.3;display:block;margin:0 auto 16px;"></i>
+          <div style="font-size:0.9rem;font-weight:600;margin-bottom:8px;">Solutions Locked</div>
+          <p style="font-size:0.82rem;opacity:0.6;">Solve the problem first to unlock community solutions!</p>
+          ${p.solved?'<p style="color:var(--success);font-size:0.85rem;margin-top:16px;">&#10003; You solved this! Check out the official approach below.</p><div style="margin-top:16px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius);padding:16px;font-size:0.82rem;color:#C0C0C0;line-height:1.7;text-align:left;">Hint: '+escHtml(p.solution_hint||'')+'</div>':''}
+        </div>
+      `;
+      lucide.createIcons();
+    }
+  }
+
+  function revealHint() {
+    hintRevealed = true;
+    document.getElementById('hintContent')?.classList.add('revealed');
+    document.querySelector('.reveal-btn')?.remove();
+  }
+
+  async function getAIHint() {
+    if (!currentProblem) return;
+    const btn = event.target;
+    const resultEl = document.getElementById('aiHintResult');
+    btn.textContent = '&#9203; Fetching hint...';
+    btn.disabled = true;
+    try {
+      const res = await fetch(`/api/problems/${currentProblem.id}/hint`, { method: 'POST' });
+      const data = await res.json();
+      if (data.success) {
+        currentHint = data.hint;
+        hintRevealed = true;
+        if (resultEl) resultEl.innerHTML = `<strong style="color:var(--success);">AI Coach:</strong> ${escHtml(data.hint)}`;
+      }
+    } catch(e) { if (resultEl) resultEl.textContent = 'Failed to get hint.'; }
+    finally { btn.textContent = '&#10024; Ask AI Coach for a Hint'; btn.disabled = false; }
+  }
+
+  function setDescTab(tab) {
+    activeDescTab = tab;
+    document.querySelectorAll('.desc-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('tab'+tab.charAt(0).toUpperCase()+tab.slice(1))?.classList.add('active');
+    renderDescription();
+  }
+
+  /* ── Run / Submit ── */
+  async function runCode() {
+    if (!currentProblem) return;
+    const statusEl = document.getElementById('statusMsg');
+    statusEl.textContent = '&#9203; Running...';
+    statusEl.className = 'status-msg running';
+    statusEl.style.display = 'block';
+    setTestTab('output');
+
+    try {
+      const res = await fetch('/api/problems/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ problem_id: currentProblem.id, code: editor.getValue() })
+      });
+      const data = await res.json();
+      if (data.success) {
+        renderTestResults(data.test_results);
+        if (data.all_passed) {
+          statusEl.textContent = '&#10003; Accepted — All tests passed!';
+          statusEl.className = 'status-msg accepted';
+          triggerConfetti();
+          // Refresh problem list to show solved
+          await loadProblems();
+        } else {
+          const passed = data.test_results.filter(t => t.passed).length;
+          statusEl.textContent = `&#10007; Wrong Answer — ${passed}/${data.test_results.length} passed`;
+          statusEl.className = 'status-msg wrong';
+        }
+      } else {
+        statusEl.textContent = '&#10007; Error: ' + data.error;
+        statusEl.className = 'status-msg wrong';
+      }
+    } catch(e) {
+      statusEl.textContent = '&#10007; Connection error';
+      statusEl.className = 'status-msg wrong';
+    }
+  }
+
+  function renderTestResults(results) {
+    const body = document.getElementById('testPanelBody');
+    if (!results?.length) { body.innerHTML = '<div class="empty-results">No test results</div>'; return; }
+    body.innerHTML = results.map((r,i) => `
+      <div class="test-case-row">
+        <div class="tc-num ${r.passed?'tc-pass':'tc-fail'}">
+          ${r.passed ? '&#10003;' : '&#10007;'} Case ${r.test_case}
+        </div>
+        <div class="tc-fields">
+          <div class="tc-field">
+            <span class="tc-label">Input</span>
+            <span class="tc-val">${JSON.stringify(r.input)}</span>
+          </div>
+          <div class="tc-field">
+            <span class="tc-label">Expected</span>
+            <span class="tc-val">${JSON.stringify(r.expected)}</span>
+          </div>
+          <div class="tc-field">
+            <span class="tc-label">Got</span>
+            <span class="tc-val ${r.error?'error-val':''}">${r.error ? r.error.substring(0,50) : JSON.stringify(r.actual)}</span>
+          </div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function showTestCasesTab() {
+    if (!currentProblem) return;
+    setTestTab('testcases');
+    const tcs = currentProblem.test_cases || [];
+    document.getElementById('testPanelBody').innerHTML = tcs.map((tc,i) => `
+      <div class="test-case-row">
+        <div class="tc-num" style="color:var(--txt2);">Case ${i+1}</div>
+        <div class="tc-fields">
+          <div class="tc-field">
+            <span class="tc-label">Input</span>
+            <span class="tc-val">${JSON.stringify(tc.input)}</span>
+          </div>
+          <div class="tc-field">
+            <span class="tc-label">Expected</span>
+            <span class="tc-val">${JSON.stringify(tc.output)}</span>
+          </div>
+        </div>
+      </div>
+    `).join('') || '<div class="empty-results">No test cases</div>';
+  }
+
+  function setTestTab(tab) {
+    activeTestTab = tab;
+    document.querySelectorAll('.test-tab').forEach(t => t.classList.remove('active'));
+    document.getElementById('ttab' + (tab === 'testcases' ? 'Cases' : 'Output'))?.classList.add('active');
+  }
+
+  /* ── Confetti ── */
+  function triggerConfetti() {
+    const colors = ['#FFA116','#00B8A3','#FFC857','#FF6B6B','#FFFFFF'];
+    for (let i = 0; i < 60; i++) {
+      const el = document.createElement('div');
+      el.className = 'confetti-piece';
+      el.style.cssText = `left:${Math.random()*100}vw;background:${colors[Math.floor(Math.random()*colors.length)]};animation-delay:${Math.random()*0.6}s;animation-duration:${1+Math.random()*0.8}s;transform:rotate(${Math.random()*360}deg);`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2500);
+    }
+  }
+
+  /* ── Filters / Search ── */
+  document.querySelectorAll('.filter-tab').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('.filter-tab').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      currentDiff = btn.dataset.diff;
+      renderList();
+    });
+  });
+  document.getElementById('searchInput').addEventListener('input', e => {
+    searchQuery = e.target.value.toLowerCase().trim();
+    renderList();
+  });
+
+  /* ── Tab switching ── */
+  document.querySelectorAll('.desc-tab').forEach(t => {
+    t.addEventListener('click', () => {
+      if (!currentProblem) return;
+      setDescTab(t.dataset.tab);
+    });
+  });
+  document.querySelectorAll('.test-tab').forEach(t => {
+    t.addEventListener('click', () => {
+      setTestTab(t.dataset.ttab);
+      if (t.dataset.ttab === 'testcases' && currentProblem) showTestCasesTab();
+    });
+  });
+
+  /* ── Buttons ── */
+  document.getElementById('btnRun').addEventListener('click', runCode);
+  document.getElementById('btnSubmit').addEventListener('click', runCode);
+  document.getElementById('btnHint').addEventListener('click', () => {
+    if (!currentProblem) return;
+    setDescTab('hints');
+  });
+
+  /* ── Keyboard ── */
+  document.addEventListener('keydown', e => {
+    if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); runCode(); }
+  });
+
+  function escHtml(s) {
+    return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+</script>
+</body>
+</html>
