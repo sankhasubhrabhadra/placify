@@ -14,11 +14,10 @@ from typing import Dict, List, Optional, Tuple, Union
 
 import docx
 import pdfplumber
-from sentence_transformers import SentenceTransformer, util
+import os
+import json
 
 logger = logging.getLogger(__name__)
-
-_model = None
 
 SKILL_TAXONOMY: Dict[str, List[str]] = {
     "python": ["python", "python3", "py"],
@@ -255,16 +254,8 @@ def parse_resume(text: str) -> ParsedResume:
     )
 
 
-def _get_model():
-    global _model
-    if _model is None:
-        logger.info("Loading sentence transformer model for ATS semantic matching...")
-        _model = SentenceTransformer("all-MiniLM-L6-v2")
-    return _model
-
-
 def _semantic_skill_coverage(resume: ParsedResume, required_skills: List[str]) -> Tuple[float, List[str]]:
-    """Score how well unmatched required skills appear semantically in the resume."""
+    """Score how well unmatched required skills appear semantically in the resume using Groq."""
     if not required_skills:
         return 1.0, []
 
@@ -273,21 +264,39 @@ def _semantic_skill_coverage(resume: ParsedResume, required_skills: List[str]) -
     if not missing:
         return 1.0, []
 
-    try:
-        model = _get_model()
-        resume_embed = model.encode(resume.raw_text[:4000], convert_to_tensor=True)
-        near_matches = []
-        scores = []
-        for skill in missing:
-            skill_embed = model.encode(skill, convert_to_tensor=True)
-            similarity = util.cos_sim(resume_embed, skill_embed).item()
-            if similarity >= 0.42:
-                near_matches.append(skill)
-            scores.append(max(similarity, 0.0))
-        return (sum(scores) / len(scores), near_matches)
-    except Exception as exc:
-        logger.error("Semantic skill scoring failed: %s", exc)
+    api_key = os.environ.get('GROQ_API_KEY')
+    if not api_key:
+        logger.warning("GROQ_API_KEY not set. Skipping semantic skill check.")
         return 0.0, []
+
+    try:
+        from groq import Groq
+        client = Groq(api_key=api_key)
+        prompt = (
+            f"Resume excerpt:\n{resume.raw_text[:4000]}\n\n"
+            f"Missing required skills: {', '.join(missing)}\n\n"
+            "Analyze the resume excerpt and determine if any of the 'Missing required skills' "
+            "are implicitly mentioned or proven by the candidate's experience. "
+            "Return ONLY a valid JSON list of strings (e.g. [\"python\", \"react\"]). "
+            "If none are found, return []."
+        )
+        resp = client.chat.completions.create(
+            model='llama3-8b-8192',
+            messages=[{'role': 'user', 'content': prompt}],
+            max_tokens=200,
+            temperature=0.0
+        )
+        content = resp.choices[0].message.content.strip()
+        match = re.search(r'\[.*\]', content, re.DOTALL)
+        if match:
+            found = json.loads(match.group(0))
+            near_matches = [s.lower() for s in found if isinstance(s, str) and s.lower() in missing]
+            score = len(near_matches) / len(missing) if missing else 0.0
+            return (score, near_matches)
+    except Exception as exc:
+        logger.error("Semantic skill scoring failed via Groq: %s", exc)
+        
+    return 0.0, []
 
 
 def _score_bucket(actual: float, target: float, weight: float) -> float:
