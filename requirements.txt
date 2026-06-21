@@ -4,3 +4,4 @@ python-docx
 pdfplumber
 sentence-transformers
 groq
+python-dotenv

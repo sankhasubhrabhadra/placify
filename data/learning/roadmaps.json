@@ -14,7 +14,7 @@
             {
               "id": "array-basics",
               "title": "Array Basics",
-              "status": "done",
+              "status": "todo",
               "description": "Learn array creation, indexing, slicing, and common operations. Understand time complexities.",
               "resources": [
                 "LeetCode Arrays 101",
@@ -71,7 +71,7 @@
             {
               "id": "fast-slow-pointers",
               "title": "Fast & Slow Pointers",
-              "status": "in-progress",
+              "status": "done",
               "description": "Floyd's cycle detection. Fast pointer moves 2x speed. Used for cycle detection and finding midpoints.",
               "resources": [
                 "Floyd's Algorithm"
