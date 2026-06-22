@@ -1,5 +1,7 @@
-from flask import Flask, request, jsonify, send_from_directory
+from flask import Flask, request, jsonify, send_from_directory, session
 from flask_cors import CORS
+from werkzeug.security import generate_password_hash, check_password_hash
+from backend.db import get_db_connection, init_db
 import os
 from dotenv import load_dotenv
 load_dotenv()  # loads .env file automatically
@@ -21,7 +23,11 @@ except ImportError:
     GROQ_AVAILABLE = False
 
 app = Flask(__name__)
+app.secret_key = os.environ.get('SECRET_KEY', 'default-secret-key-for-dev') # Change in production
 CORS(app)
+
+# Initialize database
+init_db()
 
 # Paths
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -114,7 +120,87 @@ def index():
 def serve_static(filename):
     return send_from_directory(FRONTEND_DIR, filename)
 
-# DASHBOARD
+# --- AUTHENTICATION ROUTES ---
+
+@app.route('/api/auth/signup', methods=['POST'])
+def auth_signup():
+    data = request.json or {}
+    name = data.get('name', '').strip()
+    email = data.get('email', '').strip().lower()
+    password = data.get('password', '')
+    role = data.get('role', 'candidate')
+
+    if not name or not email or not password:
+        return jsonify({'success': False, 'error': 'Missing required fields'}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    
+    # Check if email exists
+    cursor.execute('SELECT id FROM users WHERE email = ?', (email,))
+    if cursor.fetchone():
+        conn.close()
+        return jsonify({'success': False, 'error': 'Email already in use'}), 400
+
+    password_hash = generate_password_hash(password)
+    
+    try:
+        cursor.execute(
+            'INSERT INTO users (name, email, password_hash, role) VALUES (?, ?, ?, ?)',
+            (name, email, password_hash, role)
+        )
+        conn.commit()
+        user_id = cursor.lastrowid
+        session['user_id'] = user_id  # Log them in automatically
+        return jsonify({'success': True, 'message': 'Account created successfully'})
+    except Exception as e:
+        return jsonify({'success': False, 'error': str(e)}), 500
+    finally:
+        conn.close()
+
+@app.route('/api/auth/login', methods=['POST'])
+def auth_login():
+    data = request.json or {}
+    email = data.get('email', '').strip().lower()
+    password = data.get('password', '')
+
+    if not email or not password:
+        return jsonify({'success': False, 'error': 'Missing email or password'}), 400
+
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT id, password_hash, name, role FROM users WHERE email = ?', (email,))
+    user = cursor.fetchone()
+    conn.close()
+
+    if user and check_password_hash(user['password_hash'], password):
+        session['user_id'] = user['id']
+        return jsonify({'success': True, 'message': 'Logged in successfully', 'user': {'name': user['name'], 'role': user['role']}})
+    else:
+        return jsonify({'success': False, 'error': 'Invalid email or password'}), 401
+
+@app.route('/api/auth/logout', methods=['POST'])
+def auth_logout():
+    session.pop('user_id', None)
+    return jsonify({'success': True, 'message': 'Logged out successfully'})
+
+@app.route('/api/auth/me', methods=['GET'])
+def auth_me():
+    user_id = session.get('user_id')
+    if not user_id:
+        return jsonify({'success': False, 'error': 'Not logged in'}), 401
+        
+    conn = get_db_connection()
+    cursor = conn.cursor()
+    cursor.execute('SELECT name, email, role FROM users WHERE id = ?', (user_id,))
+    user = cursor.fetchone()
+    conn.close()
+
+    if user:
+        return jsonify({'success': True, 'user': {'name': user['name'], 'email': user['email'], 'role': user['role']}})
+    return jsonify({'success': False, 'error': 'User not found'}), 404
+
+# --- DASHBOARD ---
 @app.route('/api/dashboard/stats')
 def get_dashboard_stats():
     user = load_json(USER_DATA_FILE, {})

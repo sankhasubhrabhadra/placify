@@ -437,12 +437,28 @@ initLogin();
       resultsEl.innerHTML = `<div class="card" style="color: var(--error-color);">Failed to connect to server. Make sure the backend is running on port 5000.</div>`;
     }
   });
-})();
-
 // Automatically call the correct init function based on the current page
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const path = window.location.pathname;
+  const isAuthPage = path.includes('login.html') || path.includes('signup.html');
   
+  // Check auth state
+  try {
+    const res = await fetch('/api/auth/me');
+    const data = await res.json();
+    if (data.success) {
+      if (isAuthPage) window.location.href = 'index.html'; // Redirect to dashboard if logged in
+      const avatarEl = document.querySelector('.avatar');
+      if (avatarEl) avatarEl.textContent = data.user.name.charAt(0).toUpperCase();
+    } else {
+      if (!isAuthPage && path !== '/' && path !== '') {
+        // window.location.href = 'login.html'; // Uncomment to enforce login lock
+      }
+    }
+  } catch (e) {
+    console.error("Auth check failed");
+  }
+
   if (path.includes('index.html') || path === '/' || path === '') {
     if (typeof initDashboard === 'function') initDashboard();
   } else if (path.includes('interviews.html')) {
@@ -455,3 +471,57 @@ document.addEventListener('DOMContentLoaded', () => {
     if (typeof initLogin === 'function') initLogin();
   }
 });
+
+// --- LOCAL AUTHENTICATION API ---
+window.handleLogin = async function() {
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+  
+  try {
+    const res = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    const data = await res.json();
+    if (data.success) {
+      window.location.href = 'index.html';
+    } else {
+      alert("Login Error: " + data.error);
+    }
+  } catch (error) {
+    alert("Connection error.");
+  }
+};
+
+window.handleSignup = async function() {
+  const role = window.selectedRole || 'candidate';
+  const name = document.getElementById('signup-name-email').value;
+  const email = document.getElementById('signup-email').value;
+  const password = document.getElementById('signup-password').value;
+  
+  try {
+    const res = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, email, password, role })
+    });
+    const data = await res.json();
+    if (data.success) {
+      window.location.href = 'index.html';
+    } else {
+      alert("Signup Error: " + data.error);
+    }
+  } catch (error) {
+    alert("Connection error.");
+  }
+};
+
+window.handleLogout = async function() {
+  try {
+    await fetch('/api/auth/logout', { method: 'POST' });
+    window.location.href = 'login.html';
+  } catch (e) {
+    console.error(e);
+  }
+};
