@@ -64,7 +64,6 @@ def save_json(path, data):
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
-# Groq AI Helper
 def ask_groq(system_prompt, user_message, model='llama3-8b-8192'):
     if groq_client:
         try:
@@ -80,19 +79,12 @@ def ask_groq(system_prompt, user_message, model='llama3-8b-8192'):
             return completion.choices[0].message.content.strip()
         except Exception as e:
             app.logger.error(f'Groq error: {e}')
+            return f"⚠️ Groq API Error: {str(e)}. Please check your API key and rate limits."
 
-    msg_lower = user_message.lower()
-    if any(k in msg_lower for k in ['hint', 'help me', 'stuck', 'how']):
-        return 'Great question! Try breaking the problem down: what data structure gives O(1) lookups? A hash map stores key-value pairs and can solve many problems in one pass.'
-    if any(k in msg_lower for k in ['time complexity', 'big o', 'complexity']):
-        return 'Time complexity measures how runtime grows with input size. O(n) = linear, O(n^2) = quadratic, O(log n) = logarithmic. Aim for O(n log n) or better.'
-    if any(k in msg_lower for k in ['dynamic programming', 'dp']):
-        return 'DP shines when: 1) Problem has overlapping subproblems, 2) Optimal substructure exists. Start with recursion + memoization, then bottom-up tabulation.'
-    if any(k in msg_lower for k in ['graph', 'bfs', 'dfs']):
-        return 'BFS uses a queue and explores level by level - great for shortest paths. DFS uses a stack and dives deep - great for cycle detection and topological sort.'
-    if any(k in msg_lower for k in ['hello', 'hi', 'hey']):
-        return 'Hi there! I am your Placify AI Coach. Ask me anything about algorithms, data structures, or interview prep!'
-    return 'That is an interesting challenge! Think about: 1) What is the brute force? 2) What is the bottleneck? 3) What data structure can optimize it? You have got this!'
+    if not GROQ_API_KEY:
+        return "⚠️ GROQ_API_KEY is not set in the environment variables. Please add it to your Render dashboard."
+        
+    return "⚠️ Groq is not available. Please check your requirements and API key."
 
 def bootstrap_data():
     hr_file     = os.path.join(ASSESSMENT_DIR, 'hr_questions.json')
