@@ -438,3 +438,20 @@ initLogin();
     }
   });
 })();
+
+// Automatically call the correct init function based on the current page
+document.addEventListener('DOMContentLoaded', () => {
+  const path = window.location.pathname;
+  
+  if (path.includes('index.html') || path === '/' || path === '') {
+    if (typeof initDashboard === 'function') initDashboard();
+  } else if (path.includes('interviews.html')) {
+    if (typeof initInterviews === 'function') initInterviews();
+  } else if (path.includes('learning.html')) {
+    if (typeof initLearningPaths === 'function') initLearningPaths();
+  } else if (path.includes('settings.html')) {
+    if (typeof initSettings === 'function') initSettings();
+  } else if (path.includes('login.html')) {
+    if (typeof initLogin === 'function') initLogin();
+  }
+});
