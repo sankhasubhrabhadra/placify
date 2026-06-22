@@ -1,6 +1,8 @@
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import os
+from dotenv import load_dotenv
+load_dotenv()  # loads .env file automatically
 import tempfile
 import uuid
 import random
@@ -117,27 +119,43 @@ def serve_static(filename):
 def get_dashboard_stats():
     user = load_json(USER_DATA_FILE, {})
     solved = user.get('solved_problems', [])
-    return jsonify({'success': True, 'stats': {'problems_solved': len(solved) if solved else 342, 'solved_trend': 12, 'streak': 14, 'global_rank': 12403, 'mock_interviews': 8}})
+    sessions = load_json(os.path.join(INTERVIEWS_DIR, 'sessions.json'), [])
+    return jsonify({'success': True, 'stats': {'problems_solved': len(solved), 'solved_trend': 0, 'streak': 0, 'global_rank': 'Unranked', 'mock_interviews': len(sessions)}})
 
 @app.route('/api/dashboard/chart')
 def get_dashboard_chart():
-    return jsonify({'success': True, 'labels': ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], 'data': [4,7,5,10,8,14,12]})
+    # Real activity logic would go here. Defaulting to empty graph until user has activity.
+    return jsonify({'success': True, 'labels': ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], 'data': [0,0,0,0,0,0,0]})
 
 @app.route('/api/dashboard/progress')
 def get_dashboard_progress():
-    return jsonify({'success': True, 'progress': [
-        {'title': 'Data Structures', 'completed': 120, 'total': 150, 'color': 'primary', 'color_hex': 'var(--primary-accent)'},
-        {'title': 'Algorithms',      'completed': 85,  'total': 100, 'color': 'success', 'color_hex': 'var(--success-color)'},
-        {'title': 'System Design',   'completed': 15,  'total': 50,  'color': 'warning', 'color_hex': 'var(--warning-color)'}
-    ], 'top_skills': ['React','TypeScript','Node.js','PostgreSQL','AWS','System Design']})
+    rm_data = load_json(os.path.join(LEARNING_DIR, 'roadmaps.json'), {'roadmaps': []})
+    progress = []
+    color_map = {'#FFA116': 'primary', '#00B8A3': 'success', '#FF6B6B': 'error', '#FFC857': 'warning'}
+    for rm in rm_data.get('roadmaps', []):
+        total = 0
+        done = 0
+        for section in rm.get('sections', []):
+            for node in section.get('nodes', []):
+                total += 1
+                if node.get('status') == 'done':
+                    done += 1
+        progress.append({
+            'title': rm.get('title'),
+            'completed': done,
+            'total': total,
+            'color': color_map.get(rm.get('color', '#FFA116'), 'primary'),
+            'color_hex': rm.get('color', '#FFA116')
+        })
+    return jsonify({'success': True, 'progress': progress, 'top_skills': ['DSA', 'Web Dev', 'Algorithms', 'Python']})
 
 @app.route('/api/dashboard/activity')
 def get_dashboard_activity():
-    return jsonify({'success': True, 'activities': [
-        {'title': 'Solved "Two Sum"', 'time': 'Today, 2:30 PM', 'icon': 'check-circle-2', 'color': 'success'},
-        {'title': 'Completed React Fundamentals', 'time': 'Yesterday', 'icon': 'book-open', 'color': 'primary'},
-        {'title': 'Earned "Fast Learner" Badge', 'time': '3 days ago', 'icon': 'award', 'color': 'warning'}
-    ]})
+    user = load_json(USER_DATA_FILE, {})
+    activities = user.get('activities', [])
+    if not activities:
+        activities = [{'title': 'Joined Placify', 'time': 'Recently', 'icon': 'user', 'color': 'primary'}]
+    return jsonify({'success': True, 'activities': activities})
 
 # AI CHAT
 @app.route('/api/chat', methods=['POST'])
@@ -398,6 +416,47 @@ def interview_feedback(session_id):
             break
     save_json(path, iv_data)
     return jsonify({'success': True, 'feedback': feedback_text, 'score': score})
+
+@app.route('/api/interviews/session/chat', methods=['POST'])
+def interview_session_chat():
+    data = request.json or {}
+    messages = data.get('messages', [])
+    code = data.get('code', '')
+    topic = data.get('topic', 'General Coding')
+    
+    if not messages:
+        return jsonify({'success': False, 'error': 'No messages'}), 400
+        
+    if code.strip():
+        system_prompt = (
+            f"You are a technical interviewer at a top tech company conducting a pair-programming interview on the topic: {topic}. "
+            "The candidate is writing code in an editor. Be concise, act like a real interviewer, ask them to explain their approach, "
+            "and provide subtle hints if they are stuck. Do not give them the exact code solution. Keep your responses under 150 words.\n\n"
+            f"Here is the candidate's current code in the editor:\n```python\n{code}\n```"
+        )
+    else:
+        system_prompt = (
+            f"You are an interviewer at a top tech company conducting a conversational interview on the topic: {topic}. "
+            "Act like a real interviewer: ask one question at a time, wait for the candidate's response, and ask probing follow-up questions. "
+            "Be concise, professional, and do not break character. Keep your responses under 150 words."
+        )
+        
+    # Ask Groq (we pass the entire message history to groq, but since ask_groq only takes system_prompt + user_prompt, we format the history)
+    # Since ask_groq is a helper that just takes prompt and message, let's construct a prompt with history
+    history_text = ""
+    for m in messages[:-1]:
+        role = "Interviewer" if m['role'] == 'assistant' else "Candidate"
+        history_text += f"{role}: {m['content']}\n"
+        
+    last_user_message = messages[-1]['content']
+    
+    final_prompt = system_prompt
+    if history_text:
+        final_prompt += f"\n\nChat History:\n{history_text}"
+        
+    response_text = ask_groq(final_prompt, last_user_message)
+    return jsonify({'success': True, 'response': response_text})
+
 
 # RESUME
 @app.route('/api/resume/scan', methods=['POST'])

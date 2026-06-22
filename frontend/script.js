@@ -197,7 +197,7 @@ async function initInterviews() {
               <span>Interviewer: ${u.interviewer}</span>
             </div>
             <div class="mt-4 flex gap-2">
-              <button class="btn btn-primary" style="flex: 1;">Join Room</button>
+              <a href="interview_room.html?topic=${encodeURIComponent(u.topic)}" class="btn btn-primary" style="flex: 1; text-align: center; text-decoration: none;">Join Room</a>
               <button class="btn btn-outline" style="flex: 1;">Reschedule</button>
             </div>
           </div>
