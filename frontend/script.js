@@ -437,6 +437,7 @@ initLogin();
       resultsEl.innerHTML = `<div class="card" style="color: var(--error-color);">Failed to connect to server. Make sure the backend is running on port 5000.</div>`;
     }
   });
+})();
 // Automatically call the correct init function based on the current page
 document.addEventListener('DOMContentLoaded', async () => {
   const path = window.location.pathname;
