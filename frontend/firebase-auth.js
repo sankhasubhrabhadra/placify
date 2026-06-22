@@ -2,12 +2,10 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { 
   getAuth, 
-  GoogleAuthProvider, 
-  signInWithPopup, 
-  RecaptchaVerifier, 
-  signInWithPhoneNumber,
   createUserWithEmailAndPassword,
-  signInWithEmailAndPassword
+  signInWithEmailAndPassword,
+  signOut,
+  onAuthStateChanged
 } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
 
 // TODO: Replace with your actual Firebase Project Configuration
@@ -29,11 +27,6 @@ try {
   console.warn("Firebase not properly configured yet. Using mock auth for UI testing.");
 }
 
-const googleProvider = new GoogleAuthProvider();
-
-// Store the confirmation result from phone auth
-window.confirmationResult = null;
-
 // Mock function for when Firebase isn't configured yet
 function mockRedirect() {
   console.log("Mock Auth Success. Redirecting...");
@@ -44,43 +37,14 @@ function mockRedirect() {
 // LOGIN Logic
 // ----------------------
 window.handleLogin = async function(method) {
-  if (method === 'google') {
-    if (!auth) return mockRedirect();
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      console.log("Google Login Success", result.user);
-      window.location.href = "index.html";
-    } catch (error) {
-      alert("Google Login Error: " + error.message);
-    }
-  } 
-  else if (method === 'email') {
-    const email = document.getElementById('login-email').value;
-    const pass = document.getElementById('login-password').value;
-    if (!auth) return mockRedirect();
-    try {
-      await signInWithEmailAndPassword(auth, email, pass);
-      window.location.href = "index.html";
-    } catch (error) {
-      alert("Email Login Error: " + error.message);
-    }
-  }
-  else if (method === 'phone') {
-    const phone = document.getElementById('login-phone').value;
-    if (!auth) {
-      document.getElementById('btn-send-otp').style.display = 'none';
-      document.getElementById('otp-section-login').style.display = 'block';
-      return;
-    }
-    setupRecaptcha();
-    try {
-      const confirmationResult = await signInWithPhoneNumber(auth, phone, window.recaptchaVerifier);
-      window.confirmationResult = confirmationResult;
-      document.getElementById('btn-send-otp').style.display = 'none';
-      document.getElementById('otp-section-login').style.display = 'block';
-    } catch (error) {
-      alert("SMS Error: " + error.message);
-    }
+  const email = document.getElementById('login-email').value;
+  const pass = document.getElementById('login-password').value;
+  if (!auth) return mockRedirect();
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    window.location.href = "index.html";
+  } catch (error) {
+    alert("Login Error: " + error.message);
   }
 };
 
@@ -91,79 +55,57 @@ window.handleSignup = async function(method) {
   const role = window.selectedRole || 'candidate'; // from signup.html
   console.log(`Signing up as: ${role}`);
 
-  if (method === 'google') {
-    if (!auth) return mockRedirect();
-    try {
-      const result = await signInWithPopup(auth, googleProvider);
-      // Here you would usually send a request to your backend to save the user's role
-      console.log("Google Signup Success", result.user);
-      window.location.href = "index.html";
-    } catch (error) {
-      alert("Google Signup Error: " + error.message);
-    }
-  } 
-  else if (method === 'email') {
-    const email = document.getElementById('signup-email').value;
-    const pass = document.getElementById('signup-password').value;
-    const name = document.getElementById('signup-name-email').value;
-    if (!auth) return mockRedirect();
-    try {
-      const result = await createUserWithEmailAndPassword(auth, email, pass);
-      console.log("Email Signup Success", result.user);
-      window.location.href = "index.html";
-    } catch (error) {
-      alert("Email Signup Error: " + error.message);
-    }
-  }
-  else if (method === 'phone') {
-    const phone = document.getElementById('signup-phone').value;
-    const name = document.getElementById('signup-name-phone').value;
-    if (!auth) {
-      document.getElementById('btn-send-otp-signup').style.display = 'none';
-      document.getElementById('otp-section-signup').style.display = 'block';
-      return;
-    }
-    setupRecaptcha();
-    try {
-      const confirmationResult = await signInWithPhoneNumber(auth, phone, window.recaptchaVerifier);
-      window.confirmationResult = confirmationResult;
-      document.getElementById('btn-send-otp-signup').style.display = 'none';
-      document.getElementById('otp-section-signup').style.display = 'block';
-    } catch (error) {
-      alert("SMS Error: " + error.message);
-    }
-  }
-};
-
-// ----------------------
-// OTP Verification
-// ----------------------
-window.verifyOTP = async function(context) {
-  const sectionId = context === 'login' ? 'otp-section-login' : 'otp-section-signup';
-  const inputs = document.querySelectorAll(`#${sectionId} .otp-input`);
-  let otp = '';
-  inputs.forEach(input => otp += input.value);
+  const email = document.getElementById('signup-email').value;
+  const pass = document.getElementById('signup-password').value;
+  const name = document.getElementById('signup-name-email').value;
   
-  if (otp.length !== 6) {
-    alert("Please enter a 6-digit code.");
-    return;
-  }
-
   if (!auth) return mockRedirect();
-
   try {
-    const result = await window.confirmationResult.confirm(otp);
-    console.log("Phone Auth Success", result.user);
+    const result = await createUserWithEmailAndPassword(auth, email, pass);
+    console.log("Signup Success", result.user);
     window.location.href = "index.html";
   } catch (error) {
-    alert("Incorrect OTP: " + error.message);
+    alert("Signup Error: " + error.message);
   }
 };
 
-function setupRecaptcha() {
-  if (!window.recaptchaVerifier) {
-    window.recaptchaVerifier = new RecaptchaVerifier(auth, 'recaptcha-container', {
-      'size': 'invisible'
-    });
+// ----------------------
+// LOGOUT Logic
+// ----------------------
+window.handleLogout = async function() {
+  if (!auth) {
+    window.location.href = "login.html";
+    return;
   }
+  try {
+    await signOut(auth);
+    window.location.href = "login.html";
+  } catch (error) {
+    alert("Logout Error: " + error.message);
+  }
+};
+
+// ----------------------
+// AUTH OBSERVER (Optional)
+// ----------------------
+// If you want to automatically redirect users who are NOT logged in back to login.html
+if (auth) {
+  onAuthStateChanged(auth, (user) => {
+    const currentPage = window.location.pathname;
+    const isAuthPage = currentPage.includes('login.html') || currentPage.includes('signup.html');
+    
+    if (user) {
+      console.log("User is logged in:", user.email);
+      // If they are on the login page but already logged in, redirect them to index
+      if (isAuthPage) {
+        window.location.href = "index.html";
+      }
+    } else {
+      console.log("No user is logged in.");
+      // If they are NOT on an auth page and NOT logged in, redirect to login
+      if (!isAuthPage && currentPage !== "/" && currentPage !== "") {
+        // window.location.href = "login.html"; // Uncomment to enforce login lock
+      }
+    }
+  });
 }
