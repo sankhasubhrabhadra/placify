@@ -283,7 +283,15 @@ async function sendMessage() {
       if (data.success) {
         const aiBubble = document.createElement('div');
         aiBubble.className = 'chat-bubble receive';
-        aiBubble.innerHTML = `<p>${data.response}</p>`;
+        
+        let resText = data.response;
+        if (window.marked) {
+          resText = marked.parse(resText);
+        } else {
+          resText = `<p>${resText}</p>`;
+        }
+        aiBubble.innerHTML = resText;
+        
         chatMessages.appendChild(aiBubble);
         chatMessages.scrollTop = chatMessages.scrollHeight;
       }

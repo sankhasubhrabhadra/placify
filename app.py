@@ -292,8 +292,19 @@ def chat():
                      'Be concise, encouraging, and practical. Keep responses under 150 words.')
     user = load_json(USER_DATA_FILE, {})
     chat_hist = user.get('chat_history', [])
+    
+    # Format history for the AI
+    history_text = ""
+    if chat_hist:
+        history_text = "\n".join([f"{m['role'].capitalize()}: {m['content']}" for m in chat_hist[-6:]])
+    
     chat_hist.append({'role': 'user', 'content': message})
-    response_text = ask_groq(system_prompt, message)
+    
+    full_message = message
+    if history_text:
+        full_message = f"Previous conversation context:\n{history_text}\n\nCurrent Question: {message}"
+        
+    response_text = ask_groq(system_prompt, full_message)
     chat_hist.append({'role': 'assistant', 'content': response_text})
     user['chat_history'] = chat_hist[-50:]
     save_json(USER_DATA_FILE, user)
