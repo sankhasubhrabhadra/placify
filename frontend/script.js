@@ -42,7 +42,7 @@ async function initDashboard() {
               <span class="stat-title">Global Rank</span>
               <i data-lucide="globe" class="text-secondary"></i>
             </div>
-            <div class="stat-value">#${data.stats.global_rank.toLocaleString()}</div>
+            <div class="stat-value">${typeof data.stats.global_rank === 'number' ? '#' + data.stats.global_rank.toLocaleString() : data.stats.global_rank}</div>
             <div class="stat-trend trend-up">
               <i data-lucide="trending-up"></i>
               <span>Top 5%</span>

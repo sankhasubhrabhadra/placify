@@ -198,8 +198,34 @@ def auth_me():
 def get_dashboard_stats():
     user = load_json(USER_DATA_FILE, {})
     solved = user.get('solved_problems', [])
+    timestamps = user.get('solved_timestamps', [])
     sessions = load_json(os.path.join(INTERVIEWS_DIR, 'sessions.json'), [])
-    return jsonify({'success': True, 'stats': {'problems_solved': len(solved), 'solved_trend': 0, 'streak': 0, 'global_rank': 'Unranked', 'mock_interviews': len(sessions)}})
+    
+    # Calculate Streak
+    streak = 0
+    if timestamps:
+        import datetime
+        try:
+            dates = sorted(list(set([datetime.datetime.fromisoformat(ts).date() for ts in timestamps])), reverse=True)
+            today = datetime.date.today()
+            if dates and (dates[0] == today or dates[0] == today - datetime.timedelta(days=1)):
+                streak = 1
+                for i in range(1, len(dates)):
+                    if dates[i] == dates[i-1] - datetime.timedelta(days=1):
+                        streak += 1
+                    else:
+                        break
+        except Exception:
+            pass
+            
+    # Calculate Rank
+    # Require 5 problems to get a rank. Base rank 100,000, drops by ~1500 per problem
+    if len(solved) < 5:
+        rank = 'Unranked'
+    else:
+        rank = max(1, 100000 - (len(solved) * 1532))
+        
+    return jsonify({'success': True, 'stats': {'problems_solved': len(solved), 'solved_trend': 0, 'streak': streak, 'global_rank': rank, 'mock_interviews': len(sessions)}})
 
 @app.route('/api/dashboard/chart')
 def get_dashboard_chart():
