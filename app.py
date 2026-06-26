@@ -10,6 +10,7 @@ import uuid
 import random
 import json
 import re
+import datetime
 from werkzeug.utils import secure_filename
 from backend.resume_processor import extract_text, scan_resume_text
 from backend.engine import select_hr_questions, select_coding_questions, score_coding_answers, execute_code
@@ -202,8 +203,27 @@ def get_dashboard_stats():
 
 @app.route('/api/dashboard/chart')
 def get_dashboard_chart():
-    # Real activity logic would go here. Defaulting to empty graph until user has activity.
-    return jsonify({'success': True, 'labels': ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'], 'data': [0,0,0,0,0,0,0]})
+    user = load_json(USER_DATA_FILE, {})
+    timestamps = user.get('solved_timestamps', [])
+    
+    labels = []
+    data = [0] * 7
+    today = datetime.date.today()
+    
+    for i in range(6, -1, -1):
+        d = today - datetime.timedelta(days=i)
+        labels.append(d.strftime('%a'))
+    
+    for ts in timestamps:
+        try:
+            d = datetime.datetime.fromisoformat(ts).date()
+            delta = (today - d).days
+            if 0 <= delta <= 6:
+                data[6 - delta] += 1
+        except Exception:
+            pass
+            
+    return jsonify({'success': True, 'labels': labels, 'data': data})
 
 @app.route('/api/dashboard/progress')
 def get_dashboard_progress():
@@ -322,6 +342,15 @@ def submit_problem():
             solved = user.get('solved_problems', [])
             if problem_id not in solved:
                 solved.append(problem_id)
+                
+                timestamps = user.get('solved_timestamps', [])
+                timestamps.append(datetime.datetime.now().isoformat())
+                user['solved_timestamps'] = timestamps
+                
+                activities = user.get('activities', [])
+                activities.insert(0, {'title': f"Solved: {problem.get('title')}", 'time': 'Just now', 'icon': 'check-circle-2', 'color': 'success'})
+                user['activities'] = activities[:10]
+                
             user['solved_problems'] = solved
             save_json(USER_DATA_FILE, user)
         return jsonify({'success': True, 'all_passed': all_passed, 'test_results': test_results,
