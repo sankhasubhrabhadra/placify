@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Skill Simulator - Placify</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style-additions.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="layout-wrapper">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <i data-lucide="code-2" class="text-primary mr-2"></i>
+        Placify
+      </div>
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+        <a href="jobs.html" class="nav-item"><i data-lucide="file-search"></i><span>Resume Scanner</span></a>
+        <a href="simulator.html" class="nav-item active"><i data-lucide="trending-up"></i><span>Skill Simulator</span></a>
+      </nav>
+    </aside>
+
+    <div class="main-content">
+      <header class="top-nav">
+        <div class="search-bar"><i data-lucide="search" class="text-secondary"></i><input type="text" placeholder="Search..." /></div>
+      </header>
+
+      <main class="content-area">
+        <h2 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 1rem;">"What If I Learn X" Simulator</h2>
+        
+        <div class="grid grid-cols-2 gap-4">
+            <!-- Current Status -->
+            <div class="card" id="currentStatus">
+                <h3>Current Status</h3>
+                <p>Loading...</p>
+            </div>
+            
+            <!-- Simulation Results -->
+            <div class="card" id="simStatus" style="display: none; border: 2px solid var(--primary-color);">
+                <h3>Simulated Status</h3>
+                <div id="simContent"></div>
+            </div>
+        </div>
+
+        <div class="card mt-4">
+            <h3 class="mb-4">Recommended Skills to Learn</h3>
+            <div id="recommendationsList" class="flex flex-col gap-2"></div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+    
+    let candidateId = 1;
+    
+    async function loadStatus() {
+        const res = await fetch(`/api/candidates/${candidateId}/explanation`);
+        const data = await res.json();
+        
+        if (data.success) {
+            renderStatus('currentStatus', data.explanation, 'Current');
+            renderRecommendations(data.explanation.skill_gaps);
+        }
+    }
+    
+    function renderStatus(elementId, expl, title) {
+        const el = document.getElementById(elementId);
+        if(elementId === 'simStatus') {
+            el.style.display = 'block';
+            el = document.getElementById('simContent');
+        }
+        
+        el.innerHTML = `
+            <h4 class="mb-2">Score: ${expl.final_score}/100</h4>
+            <p class="mb-2"><strong>Decision:</strong> ${expl.decision.toUpperCase()}</p>
+            <p class="mb-2"><strong>Confidence:</strong> ${expl.confidence_score}%</p>
+            <div class="mb-2">
+                <strong>Skills Claimed & Verified:</strong> 
+                ${expl.verified_skills.length ? expl.verified_skills.map(s => `<span class="badge" style="background-color: var(--success-color); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; margin-right: 4px;">✔ ${s}</span>`).join('') : 'None'}
+            </div>
+            <div class="mb-2">
+                <strong>Skills Claimed but Unverified:</strong> 
+                ${expl.unverified_skills.length ? expl.unverified_skills.map(s => `<span class="badge" style="background-color: var(--warning-color); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; margin-right: 4px;">⚠ ${s}</span>`).join('') : 'None'}
+            </div>
+            <div class="mb-2">
+                <strong>Demonstrated but NOT Claimed (Opportunities):</strong> 
+                ${expl.opportunities.length ? expl.opportunities.map(s => `<span class="badge" style="background-color: var(--primary-color); color: white; padding: 2px 6px; border-radius: 4px; font-size: 0.8rem; margin-right: 4px;">★ ${s}</span>`).join('') : 'None'}
+            </div>
+            <div class="mb-2">
+                <strong>Gaps:</strong> ${expl.skill_gaps.join(', ')}
+            </div>
+        `;
+    }
+    
+    async function renderRecommendations(gaps) {
+        const res = await fetch(`/api/candidates/${candidateId}/simulate`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({skills: []}) // will just calculate impacts
+        });
+        const data = await res.json();
+        
+        const list = document.getElementById('recommendationsList');
+        list.innerHTML = '';
+        
+        if (data.success && data.recommendations.length > 0) {
+            data.recommendations.forEach(rec => {
+                const btn = document.createElement('button');
+                btn.className = 'btn btn-secondary';
+                btn.style = 'justify-content: space-between; text-align: left; padding: 1rem;';
+                btn.innerHTML = `
+                    <span><strong>Learn ${rec.skill}</strong></span>
+                    <span class="text-primary">+${rec.score_impact} points</span>
+                `;
+                btn.onclick = () => simulateSkill(rec.skill);
+                list.appendChild(btn);
+            });
+            
+            const topSkill = data.recommendations[0].skill;
+            const topLink = document.createElement('div');
+            topLink.className = 'mt-4';
+            topLink.innerHTML = `<a href="learning.html?skill=${topSkill}" class="btn btn-primary">Start learning ${topSkill}</a>`;
+            list.appendChild(topLink);
+        } else {
+            list.innerHTML = '<p class="text-secondary">No recommendations right now.</p>';
+        }
+    }
+    
+    async function simulateSkill(skill) {
+        const res = await fetch(`/api/candidates/${candidateId}/simulate`, {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({skills: [skill]})
+        });
+        const data = await res.json();
+        if (data.success) {
+            renderStatus('simStatus', data.simulated, `If you learned ${skill}`);
+        }
+    }
+    
+    loadStatus();
+  </script>
+</body>
+</html>

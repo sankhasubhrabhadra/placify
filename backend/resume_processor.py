@@ -53,6 +53,8 @@ SKILL_TAXONOMY: Dict[str, List[str]] = {
     "jenkins": ["jenkins", "ci/cd", "cicd", "continuous integration"],
     "spring": ["spring", "spring boot"],
     "etl": ["etl", "data pipeline", "data pipelines"],
+    "data structures": ["data structures", "array", "tree", "hash table", "linked list", "graph", "matrix"],
+    "algorithms": ["algorithms", "dynamic programming", "greedy", "sorting", "searching", "depth-first search", "breadth-first search", "union find", "two pointers"],
 }
 
 SECTION_HEADERS = [
@@ -451,3 +453,34 @@ def scan_resume_text(text: str, job_config: Dict) -> Dict:
         "sections_found": resume.sections_found,
         "breakdown": score_payload["breakdown"],
     }
+
+
+def cross_check_skills(candidate_skills: List[str], solved_problems: List[Dict]) -> Dict[str, List[str]]:
+    """Cross-checks resume skills against platform performance."""
+    demonstrated_skills = set()
+    
+    if solved_problems:
+        # All executed code is Python currently
+        demonstrated_skills.add("python")
+        
+    for prob in solved_problems:
+        tags = prob.get("tags", [])
+        for tag in tags:
+            tag_lower = tag.lower()
+            # Map tags to taxonomy
+            for skill_key, aliases in SKILL_TAXONOMY.items():
+                if tag_lower in aliases:
+                    demonstrated_skills.add(skill_key)
+                    
+    candidate_set = set(s.lower() for s in candidate_skills)
+    
+    verified = list(candidate_set & demonstrated_skills)
+    unverified = list(candidate_set - demonstrated_skills)
+    opportunities = list(demonstrated_skills - candidate_set)
+    
+    return {
+        "verified_skills": sorted(verified),
+        "unverified_skills": sorted(unverified),
+        "opportunities": sorted(opportunities)
+    }
+

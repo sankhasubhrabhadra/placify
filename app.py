@@ -12,7 +12,7 @@ import json
 import re
 import datetime
 from werkzeug.utils import secure_filename
-from backend.resume_processor import extract_text, scan_resume_text
+from backend.resume_processor import extract_text, scan_resume_text, cross_check_skills
 from backend.engine import select_hr_questions, select_coding_questions, score_coding_answers, execute_code
 from backend.scoring_logic import generate_explanation, calculate_confidence_score, determine_next_stage
 
@@ -46,6 +46,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Groq Client
 GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '')
+GROQ_MODEL = os.environ.get('GROQ_MODEL', 'openai/gpt-oss-20b')
+GROQ_FALLBACK_MODEL = os.environ.get('GROQ_FALLBACK_MODEL', 'openai/gpt-oss-120b')
 groq_client = None
 if GROQ_AVAILABLE and GROQ_API_KEY:
     groq_client = Groq(api_key=GROQ_API_KEY)
@@ -65,11 +67,16 @@ def save_json(path, data):
     with open(path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
-def ask_groq(system_prompt, user_message, model='llama3-8b-8192'):
-    if groq_client:
+def ask_groq(system_prompt, user_message, model=None):
+    if not GROQ_AVAILABLE or not GROQ_API_KEY or not groq_client:
+        app.logger.error('Groq is not available or missing API key.')
+        return None
+
+    models_to_try = [model] if model else [GROQ_MODEL, GROQ_FALLBACK_MODEL]
+    for m in models_to_try:
         try:
             completion = groq_client.chat.completions.create(
-                model=model,
+                model=m,
                 messages=[
                     {'role': 'system', 'content': system_prompt},
                     {'role': 'user',   'content': user_message}
@@ -79,13 +86,9 @@ def ask_groq(system_prompt, user_message, model='llama3-8b-8192'):
             )
             return completion.choices[0].message.content.strip()
         except Exception as e:
-            app.logger.error(f'Groq error: {e}')
-            return f"⚠️ Groq API Error: {str(e)}. Please check your API key and rate limits."
-
-    if not GROQ_API_KEY:
-        return "⚠️ GROQ_API_KEY is not set in the environment variables. Please add it to your Render dashboard."
-        
-    return "⚠️ Groq is not available. Please check your requirements and API key."
+            app.logger.error(f'Groq error with model {m}: {e}')
+    
+    return None
 
 def bootstrap_data():
     hr_file     = os.path.join(ASSESSMENT_DIR, 'hr_questions.json')
@@ -305,6 +308,8 @@ def chat():
         full_message = f"Previous conversation context:\n{history_text}\n\nCurrent Question: {message}"
         
     response_text = ask_groq(system_prompt, full_message)
+    if response_text is None:
+        return jsonify({'success': False, 'error': 'AI service is temporarily unavailable.'}), 503
     chat_hist.append({'role': 'assistant', 'content': response_text})
     user['chat_history'] = chat_hist[-50:]
     save_json(USER_DATA_FILE, user)
@@ -405,6 +410,8 @@ def get_problem_hint(problem_id):
                          'Point to the key data structure or technique in 2-3 sentences.')
         user_msg = f"Problem: {problem['title']}\nDescription: {problem['description']}\nPre-stored hint: {problem.get('solution_hint','')}\n\nGive a hint."
         hint = ask_groq(system_prompt, user_msg)
+        if hint is None:
+            return jsonify({'success': False, 'error': 'AI service is temporarily unavailable.'}), 503
         return jsonify({'success': True, 'hint': hint})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -550,7 +557,9 @@ def interview_feedback(session_id):
     qa_text = '\n'.join([f"Q: {a['question']}\nA: {a['answer']}" for a in answers])
     system_prompt = ('You are an expert technical interviewer. Evaluate the answers and provide structured feedback.\n'
                      'Format: SCORE: X/10\nSTRENGTHS:\n- ...\nAREAS TO IMPROVE:\n- ...\nSUMMARY: ...')
-    feedback_text = ask_groq(system_prompt, f'Topic: {topic}\n\n{qa_text}', model='llama3-8b-8192')
+    feedback_text = ask_groq(system_prompt, f'Topic: {topic}\n\n{qa_text}')
+    if feedback_text is None:
+        return jsonify({'success': False, 'error': 'AI service is temporarily unavailable.'}), 503
     score_match = re.search(r'SCORE:\s*(\d+)/10', feedback_text)
     score = int(score_match.group(1)) if score_match else 7
     for session in iv_data.get('past', []):
@@ -599,6 +608,8 @@ def interview_session_chat():
         final_prompt += f"\n\nChat History:\n{history_text}"
         
     response_text = ask_groq(final_prompt, last_user_message)
+    if response_text is None:
+        return jsonify({'success': False, 'error': 'AI service is temporarily unavailable.'}), 503
     return jsonify({'success': True, 'response': response_text})
 
 
@@ -623,6 +634,15 @@ def scan_resume():
             ai_feedback = ask_groq(
                 'You are a senior technical recruiter. Review the resume and provide actionable feedback in 3 bullet points.',
                 f'Resume:\n{text[:2000]}\n\nGive 3 specific improvement tips.')
+            if ai_feedback is None:
+                return jsonify({'success': False, 'error': 'AI service is temporarily unavailable.'}), 503
+        
+        # Persist to user.json for the explanation engine
+        user = load_json(USER_DATA_FILE, {})
+        user['candidate_skills'] = result.get('skills_found', [])
+        user['resume_score'] = result.get('match_score', 0)
+        save_json(USER_DATA_FILE, user)
+
         return jsonify({'success': True, **result, 'ai_feedback': ai_feedback})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
@@ -645,12 +665,147 @@ def user_profile():
                     'profile': user.get('profile', {'name':'Placify User','email':'user@placify.dev','title':'Software Engineer'}),
                     'preferences': user.get('preferences', {'email_notifications':True,'public_profile':True,'dark_mode':True})})
 
-@app.route('/api/auth/login', methods=['POST'])
-def login():
+
+
+
+@app.route('/api/candidates/<int:candidate_id>/explanation', methods=['GET'])
+def get_candidate_explanation(candidate_id):
+    user = load_json(USER_DATA_FILE, {})
+    
+    # Extract persisted scores
+    resume_score = user.get('resume_score', 0)
+    solved = user.get('solved_problems', [])
+    coding_score = min(100, len(solved) * 20)  # simple scoring
+    sql_score = None  # Implement later if we add SQL specific problems
+    
+    scores = {"resume": resume_score, "coding": coding_score, "sql": sql_score}
+    candidate_skills = user.get('candidate_skills', [])
+    
+    # Load required skills from job_roles.json
+    job_roles = load_json(os.path.join(BASE_DIR, 'data', 'job_roles.json'), {})
+    targeted_role = user.get('targeted_role', 'backend_engineer')
+    role_data = job_roles.get(targeted_role, {})
+    required_skills = role_data.get('required_skills', ['python', 'sql'])
+    
+    # Default behavior metrics
+    fraud_score = 0
+    timing_anomalies = 0
+    
+    # Cross-check skills
+    all_questions = load_json(os.path.join(ASSESSMENT_DIR, 'questions.json'), [])
+    solved_objs = [q for q in all_questions if q.get('id') in solved]
+    cross_check = cross_check_skills(candidate_skills, solved_objs)
+    
+    # Calculate confidence
+    candidate_data = {
+        "scores": scores,
+        "fraud_score": fraud_score,
+        "timing_anomalies": timing_anomalies
+    }
+    confidence_result = calculate_confidence_score(candidate_data)
+    confidence_score = confidence_result.get("overall_confidence", 0.0)
+    
+    # Determine basic decision
+    final_score = (resume_score + coding_score) / 2
+    if final_score >= 80:
+        decision = "shortlist"
+    elif final_score >= 60:
+        decision = "interview"
+    else:
+        decision = "reject"
+        
+    explanation = generate_explanation(
+        candidate_id=candidate_id,
+        decision=decision,
+        final_score=final_score,
+        scores=scores,
+        confidence_score=confidence_score,
+        fraud_score=fraud_score,
+        candidate_skills=candidate_skills,
+        required_skills=required_skills,
+        timing_anomalies=timing_anomalies,
+        consistency_score=confidence_result.get("consistency_confidence", 100.0)
+    )
+    
+    explanation['verified_skills'] = cross_check['verified_skills']
+    explanation['unverified_skills'] = cross_check['unverified_skills']
+    explanation['opportunities'] = cross_check['opportunities']
+    
+    return jsonify({'success': True, 'explanation': explanation})
+
+
+@app.route('/api/candidates/<int:candidate_id>/simulate', methods=['POST'])
+def simulate_skill_impact(candidate_id):
     data = request.json or {}
-    if data.get('email') and data.get('password'):
-        return jsonify({'success': True, 'token': f'mock-jwt-{uuid.uuid4().hex[:16]}'})
-    return jsonify({'success': False, 'error': 'Email and password required'}), 400
+    hypothetical_skills = data.get('skills', [])
+    
+    user = load_json(USER_DATA_FILE, {})
+    
+    # Original data
+    resume_score = user.get('resume_score', 0)
+    solved = user.get('solved_problems', [])
+    coding_score = min(100, len(solved) * 20)
+    sql_score = None
+    original_scores = {"resume": resume_score, "coding": coding_score, "sql": sql_score}
+    candidate_skills = user.get('candidate_skills', [])
+    
+    job_roles = load_json(os.path.join(BASE_DIR, 'data', 'job_roles.json'), {})
+    targeted_role = user.get('targeted_role', 'backend_engineer')
+    required_skills = job_roles.get(targeted_role, {}).get('required_skills', ['python', 'sql'])
+    
+    all_questions = load_json(os.path.join(ASSESSMENT_DIR, 'questions.json'), [])
+    solved_objs = [q for q in all_questions if q.get('id') in solved]
+    
+    fraud_score = 0
+    timing_anomalies = 0
+    
+    # Helper to generate explanation given candidate skills
+    def get_expl(c_skills):
+        # Recalculate resume score
+        matched = set(c_skills) & set(required_skills)
+        r_score = int((len(matched) / len(required_skills)) * 100) if required_skills else 100
+        scores = {"resume": r_score, "coding": coding_score, "sql": sql_score}
+        
+        c_data = {"scores": scores, "fraud_score": fraud_score, "timing_anomalies": timing_anomalies}
+        conf_res = calculate_confidence_score(c_data)
+        conf_score = conf_res.get("overall_confidence", 0.0)
+        
+        f_score = (r_score + coding_score) / 2
+        dec = "shortlist" if f_score >= 80 else "interview" if f_score >= 60 else "reject"
+            
+        expl = generate_explanation(
+            candidate_id=candidate_id, decision=dec, final_score=f_score, scores=scores,
+            confidence_score=conf_score, fraud_score=fraud_score, candidate_skills=c_skills,
+            required_skills=required_skills, timing_anomalies=timing_anomalies,
+            consistency_score=conf_res.get("consistency_confidence", 100.0)
+        )
+        cross_c = cross_check_skills(c_skills, solved_objs)
+        expl['verified_skills'] = cross_c['verified_skills']
+        expl['unverified_skills'] = cross_c['unverified_skills']
+        expl['opportunities'] = cross_c['opportunities']
+        return expl
+        
+    original_expl = get_expl(candidate_skills)
+    
+    new_skills = list(set(candidate_skills + hypothetical_skills))
+    new_expl = get_expl(new_skills)
+    
+    # Calculate impact of each gap
+    gaps = original_expl['skill_gaps']
+    impacts = []
+    for gap in gaps:
+        expl = get_expl(candidate_skills + [gap])
+        score_delta = expl['final_score'] - original_expl['final_score']
+        impacts.append({"skill": gap, "score_impact": score_delta})
+    
+    impacts.sort(key=lambda x: x['score_impact'], reverse=True)
+    
+    return jsonify({
+        'success': True,
+        'original': original_expl,
+        'simulated': new_expl,
+        'recommendations': impacts
+    })
 
 if __name__ == '__main__':
     bootstrap_data()

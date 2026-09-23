@@ -53,9 +53,21 @@ def select_coding_questions(job_role_id: int, score: int = None, n: int = None) 
 
 def execute_code(code_string: str, test_case: Dict[str, Any]) -> Tuple[bool, str, Any]:
     """Execute Python code against a single test case."""
+    # NOTE: This is subprocess-level hardening, not full container isolation.
+    # A hosted judge (Judge0, Piston) or Docker-based sandbox would be more robust for a real production deployment.
     temp_file = None
     try:
         temp_file = tempfile.NamedTemporaryFile(mode="w", delete=False, suffix=".py", encoding="utf-8")
+        
+        # Security: Prevent network access via Python audit hooks
+        security_stub = (
+            "import sys\n"
+            "def block_network(event, args):\n"
+            "    if event.startswith('socket.'):\n"
+            "        raise PermissionError('Network access is blocked in this sandbox')\n"
+            "sys.addaudithook(block_network)\n\n"
+        )
+        temp_file.write(security_stub)
         temp_file.write(code_string)
         temp_file.write("\n\n# AUTO-GENERATED TEST CODE\n")
 
@@ -90,7 +102,16 @@ def execute_code(code_string: str, test_case: Dict[str, Any]) -> Tuple[bool, str
         temp_file.write(test_code)
         temp_file.close()
 
-        result = subprocess.run([sys.executable, temp_file.name], capture_output=True, timeout=5, text=True)
+        # Security: Cap memory usage to 256MB on Linux
+        kwargs = {}
+        if sys.platform != 'win32':
+            def set_limits():
+                import resource
+                mem_limit = 256 * 1024 * 1024
+                resource.setrlimit(resource.RLIMIT_AS, (mem_limit, mem_limit))
+            kwargs['preexec_fn'] = set_limits
+
+        result = subprocess.run([sys.executable, temp_file.name], capture_output=True, timeout=5, text=True, **kwargs)
         output, error = result.stdout.strip(), result.stderr.strip() or None
 
         try:
