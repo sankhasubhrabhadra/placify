@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "https://placify-yfvb.onrender.com/api/$1"
+    }
+  ]
+}
