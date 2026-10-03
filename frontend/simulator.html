@@ -58,7 +58,8 @@
   <script>
     lucide.createIcons();
     
-    let candidateId = 1;
+    const urlParams = new URLSearchParams(window.location.search);
+    let candidateId = urlParams.get('candidate_id') || 1;
     
     async function loadStatus() {
         const res = await fetch(`/api/candidates/${candidateId}/explanation`);

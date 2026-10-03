@@ -90,6 +90,21 @@ def ask_groq(system_prompt, user_message, model=None):
     
     return None
 
+
+def get_candidate_data(candidate_id=1):
+    data = load_json(USER_DATA_FILE, {})
+    if 'candidates' not in data:
+        return data
+    return data.get('candidates', {}).get(str(candidate_id), {})
+
+def save_candidate_data(candidate_id, candidate_data):
+    data = load_json(USER_DATA_FILE, {})
+    if 'candidates' not in data:
+        data = {'candidates': {'1': data}}
+    
+    data['candidates'][str(candidate_id)] = candidate_data
+    save_json(USER_DATA_FILE, data)
+
 def bootstrap_data():
     hr_file     = os.path.join(ASSESSMENT_DIR, 'hr_questions.json')
     if not os.path.exists(hr_file):
@@ -102,11 +117,19 @@ def bootstrap_data():
         ])
     if not os.path.exists(USER_DATA_FILE):
         save_json(USER_DATA_FILE, {
-            'profile': {'name': 'Placify User', 'email': 'user@placify.dev', 'title': 'Software Engineer'},
-            'preferences': {'email_notifications': True, 'public_profile': True, 'dark_mode': True},
-            'solved_problems': [],
-            'chat_history': []
+            'candidates': {
+                '1': {
+                    'profile': {'name': 'Placify User', 'email': 'user@placify.dev', 'title': 'Software Engineer'},
+                    'preferences': {'email_notifications': True, 'public_profile': True, 'dark_mode': True},
+                    'solved_problems': [],
+                    'chat_history': []
+                }
+            }
         })
+    else:
+        data = load_json(USER_DATA_FILE, {})
+        if 'candidates' not in data:
+            save_json(USER_DATA_FILE, {'candidates': {'1': data}})
 
 @app.route('/')
 def index():
@@ -199,7 +222,7 @@ def auth_me():
 # --- DASHBOARD ---
 @app.route('/api/dashboard/stats')
 def get_dashboard_stats():
-    user = load_json(USER_DATA_FILE, {})
+    user = get_candidate_data(session.get('user_id', 1))
     solved = user.get('solved_problems', [])
     timestamps = user.get('solved_timestamps', [])
     sessions = load_json(os.path.join(INTERVIEWS_DIR, 'sessions.json'), [])
@@ -232,7 +255,7 @@ def get_dashboard_stats():
 
 @app.route('/api/dashboard/chart')
 def get_dashboard_chart():
-    user = load_json(USER_DATA_FILE, {})
+    user = get_candidate_data(session.get('user_id', 1))
     timestamps = user.get('solved_timestamps', [])
     
     labels = []
@@ -278,7 +301,7 @@ def get_dashboard_progress():
 
 @app.route('/api/dashboard/activity')
 def get_dashboard_activity():
-    user = load_json(USER_DATA_FILE, {})
+    user = get_candidate_data(session.get('user_id', 1))
     activities = user.get('activities', [])
     if not activities:
         activities = [{'title': 'Joined Placify', 'time': 'Recently', 'icon': 'user', 'color': 'primary'}]
@@ -293,7 +316,7 @@ def chat():
         return jsonify({'success': False, 'error': 'Empty message'}), 400
     system_prompt = ('You are Placify AI Coach, an expert computer science tutor specialising in DSA and interview prep. '
                      'Be concise, encouraging, and practical. Keep responses under 150 words.')
-    user = load_json(USER_DATA_FILE, {})
+    user = get_candidate_data(session.get('user_id', 1))
     chat_hist = user.get('chat_history', [])
     
     # Format history for the AI
@@ -312,7 +335,7 @@ def chat():
         return jsonify({'success': False, 'error': 'AI service is temporarily unavailable.'}), 503
     chat_hist.append({'role': 'assistant', 'content': response_text})
     user['chat_history'] = chat_hist[-50:]
-    save_json(USER_DATA_FILE, user)
+    save_candidate_data(session.get('user_id', 1), user)
     return jsonify({'success': True, 'response': response_text})
 
 # PROBLEMS
@@ -380,7 +403,7 @@ def submit_problem():
                 if p['id'] == problem_id:
                     p['solved'] = True
             save_problems(problems)
-            user = load_json(USER_DATA_FILE, {})
+            user = get_candidate_data(session.get('user_id', 1))
             solved = user.get('solved_problems', [])
             if problem_id not in solved:
                 solved.append(problem_id)
@@ -394,7 +417,7 @@ def submit_problem():
                 user['activities'] = activities[:10]
                 
             user['solved_problems'] = solved
-            save_json(USER_DATA_FILE, user)
+            save_candidate_data(session.get('user_id', 1), user)
         return jsonify({'success': True, 'all_passed': all_passed, 'test_results': test_results,
                         'problem_title': problem.get('title')})
     except Exception as e:
@@ -638,12 +661,13 @@ def scan_resume():
                 return jsonify({'success': False, 'error': 'AI service is temporarily unavailable.'}), 503
         
         # Persist to user.json for the explanation engine
-        user = load_json(USER_DATA_FILE, {})
+        user = get_candidate_data(session.get('user_id', 1))
         user['candidate_skills'] = result.get('skills_found', [])
         user['resume_score'] = result.get('match_score', 0)
-        save_json(USER_DATA_FILE, user)
+        c_id = session.get('user_id', 1)
+        save_candidate_data(c_id, user)
 
-        return jsonify({'success': True, **result, 'ai_feedback': ai_feedback})
+        return jsonify({'success': True, **result, 'ai_feedback': ai_feedback, 'candidate_id': c_id})
     except Exception as e:
         return jsonify({'success': False, 'error': str(e)}), 500
 
@@ -652,15 +676,15 @@ def scan_resume():
 def user_profile():
     if request.method == 'POST':
         data = request.json or {}
-        user = load_json(USER_DATA_FILE, {})
+        user = get_candidate_data(session.get('user_id', 1))
         if 'profile' not in user:
             user['profile'] = {}
         user['profile'].update({k: v for k, v in data.items() if k in ['name','email','title']})
         if 'preferences' in data:
             user.setdefault('preferences', {}).update(data['preferences'])
-        save_json(USER_DATA_FILE, user)
+        save_candidate_data(session.get('user_id', 1), user)
         return jsonify({'success': True, 'message': 'Profile updated'})
-    user = load_json(USER_DATA_FILE, {})
+    user = get_candidate_data(session.get('user_id', 1))
     return jsonify({'success': True,
                     'profile': user.get('profile', {'name':'Placify User','email':'user@placify.dev','title':'Software Engineer'}),
                     'preferences': user.get('preferences', {'email_notifications':True,'public_profile':True,'dark_mode':True})})
@@ -670,7 +694,7 @@ def user_profile():
 
 @app.route('/api/candidates/<int:candidate_id>/explanation', methods=['GET'])
 def get_candidate_explanation(candidate_id):
-    user = load_json(USER_DATA_FILE, {})
+    user = get_candidate_data(candidate_id)
     
     # Extract persisted scores
     resume_score = user.get('resume_score', 0)
@@ -739,7 +763,7 @@ def simulate_skill_impact(candidate_id):
     data = request.json or {}
     hypothetical_skills = data.get('skills', [])
     
-    user = load_json(USER_DATA_FILE, {})
+    user = get_candidate_data(candidate_id)
     
     # Original data
     resume_score = user.get('resume_score', 0)

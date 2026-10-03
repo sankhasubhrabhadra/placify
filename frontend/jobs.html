@@ -43,6 +43,10 @@
           <i data-lucide="file-search"></i>
           <span>Resume Scanner</span>
         </a>
+        <a href="simulator.html" class="nav-item">
+          <i data-lucide="sparkles"></i>
+          <span>Skill Simulator</span>
+        </a>
       </nav>
       <div class="sidebar-footer">
         <a href="settings.html" class="nav-item">
@@ -157,6 +161,13 @@
               <ul class="text-secondary" style="margin-left: 1.25rem;">
                 ${result.explanation.reasons.map(reason => `<li style="margin-bottom:0.25rem;">${reason}</li>`).join('')}
               </ul>
+            </div>
+            
+            <div style="margin-top: 1.5rem; text-align: right;">
+              <a href="simulator.html?candidate_id=${result.candidate_id}" class="btn btn-primary" style="display: inline-flex; align-items: center; text-decoration: none;">
+                <i data-lucide="sparkles" style="width: 18px; height: 18px; margin-right: 0.5rem;"></i>
+                See what skills would improve your match
+              </a>
             </div>
           </div>
         `;
