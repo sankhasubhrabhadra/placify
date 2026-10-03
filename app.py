@@ -71,7 +71,7 @@ def save_json(path, data):
 def ask_groq(system_prompt, user_message, model=None):
     # Hijacked to use Local LLaMA via Ollama instead of Groq
     ollama_url = "http://localhost:11434/api/chat"
-    model_name = os.environ.get('OLLAMA_MODEL', 'llama3.1') # Default to llama3.1
+    model_name = os.environ.get('OLLAMA_MODEL', 'llama3.1:8b') # Default to llama3.1:8b
     
     payload = {
         "model": model_name,
