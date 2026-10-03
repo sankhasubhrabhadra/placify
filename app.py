@@ -3,6 +3,7 @@ from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from backend.db import get_db_connection, init_db
 import os
+import requests
 from dotenv import load_dotenv
 load_dotenv()  # loads .env file automatically
 import tempfile
@@ -68,27 +69,29 @@ def save_json(path, data):
         json.dump(data, f, indent=2, ensure_ascii=False)
 
 def ask_groq(system_prompt, user_message, model=None):
-    if not GROQ_AVAILABLE or not GROQ_API_KEY or not groq_client:
-        app.logger.error('Groq is not available or missing API key.')
-        return None
-
-    models_to_try = [model] if model else [GROQ_MODEL, GROQ_FALLBACK_MODEL]
-    for m in models_to_try:
-        try:
-            completion = groq_client.chat.completions.create(
-                model=m,
-                messages=[
-                    {'role': 'system', 'content': system_prompt},
-                    {'role': 'user',   'content': user_message}
-                ],
-                max_tokens=512,
-                temperature=0.7,
-            )
-            return completion.choices[0].message.content.strip()
-        except Exception as e:
-            app.logger.error(f'Groq error with model {m}: {e}')
+    # Hijacked to use Local LLaMA via Ollama instead of Groq
+    ollama_url = "http://localhost:11434/api/chat"
+    model_name = os.environ.get('OLLAMA_MODEL', 'llama3.1') # Default to llama3.1
     
-    return None
+    payload = {
+        "model": model_name,
+        "messages": [
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_message}
+        ],
+        "stream": False,
+        "options": {
+            "temperature": 0.7
+        }
+    }
+    
+    try:
+        response = requests.post(ollama_url, json=payload, timeout=60)
+        response.raise_for_status()
+        return response.json()['message']['content'].strip()
+    except Exception as e:
+        app.logger.error(f"Ollama local error: {e}")
+        return None
 
 
 def get_candidate_data(candidate_id=1):
