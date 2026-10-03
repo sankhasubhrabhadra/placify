@@ -84,13 +84,23 @@
         <a href="interviews.html" style="color:var(--txt2); display:flex; align-items:center; text-decoration:none;"><i data-lucide="arrow-left" style="width:20px;height:20px;margin-right:8px;"></i></a>
         <span class="topbar-title"><i data-lucide="mic"></i> Live Interview Room</span>
       </div>
+      
       <div class="topbar-right">
-        <button class="btn-end" id="btnEnd"><i data-lucide="square" style="width:14px;height:14px;"></i> End Interview</button>
+        <div id="timerDisplay" style="font-weight: 700; color: var(--warning); background: rgba(255, 200, 87, 0.1); padding: 6px 12px; border-radius: var(--radius); font-variant-numeric: tabular-nums;">05:00</div>
+        <button class="btn-end" onclick="endInterview()">
+ id="btnEnd"><i data-lucide="square" style="width:14px;height:14px;"></i> End Interview</button>
       </div>
     </div>
 
     <!-- Chat Panel -->
-    <div class="panel-chat">
+    
+    <div class="panel-chat" style="position:relative;">
+      <!-- Camera Widget -->
+      <div id="cameraWidget" style="position: absolute; top: 16px; right: 16px; width: 180px; height: 135px; background: #000; border: 2px solid var(--border); border-radius: var(--radius); overflow: hidden; z-index: 10; box-shadow: 0 4px 12px rgba(0,0,0,0.5);">
+        <video id="interviewCam" autoplay muted playsinline style="width: 100%; height: 100%; object-fit: cover;"></video>
+        <canvas id="captureCanvas" style="display:none;"></canvas>
+      </div>
+
       <div class="chat-history" id="chatHistory">
         <!-- Chat messages injected here -->
       </div>
@@ -221,5 +231,19 @@
     return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g, '<br>');
   }
 </script>
+
+  <!-- Review Modal -->
+  <div id="reviewModal" style="display:none; position:fixed; top:0; left:0; width:100vw; height:100vh; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center; padding: 20px;">
+    <div style="background:var(--surface); width:100%; max-width:700px; max-height:80vh; border-radius:var(--radius); border:1px solid var(--border); display:flex; flex-direction:column; overflow:hidden;">
+      <div style="padding: 20px; border-bottom: 1px solid var(--border); display:flex; justify-content:space-between; align-items:center;">
+        <h2 style="color:var(--txt); margin:0;">Interview Review</h2>
+        <button onclick="window.location.href='interviews.html'" style="background:var(--accent); color:#000; border:none; padding:8px 16px; border-radius:var(--radius); font-weight:600; cursor:pointer;">Return to Dashboard</button>
+      </div>
+      <div id="reviewContent" style="padding: 20px; overflow-y:auto; line-height:1.6; color:var(--txt2); white-space:pre-wrap;">
+        Analyzing interview performance...
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
