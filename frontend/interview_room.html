@@ -10,7 +10,98 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
   <!-- Lucide Icons -->
-  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://unpkg.com/lucide@latest">
+  let visionContext = "";
+  let interviewDuration = 300; // 5 minutes
+  let timerInterval = null;
+  let frameInterval = null;
+
+  async function initCamera() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      document.getElementById('interviewCam').srcObject = stream;
+      frameInterval = setInterval(captureAndAnalyzeFrame, 20000);
+    } catch (err) {
+      console.error("Camera access denied:", err);
+    }
+  }
+
+  function startTimer() {
+    const display = document.getElementById('timerDisplay');
+    timerInterval = setInterval(() => {
+      interviewDuration--;
+      let m = Math.floor(interviewDuration / 60);
+      let s = interviewDuration % 60;
+      display.textContent = (m < 10 ? '0'+m : m) + ':' + (s < 10 ? '0'+s : s);
+      if (interviewDuration <= 0) {
+        clearInterval(timerInterval);
+        endInterview();
+      }
+    }, 1000);
+  }
+
+  async function captureAndAnalyzeFrame() {
+    const video = document.getElementById('interviewCam');
+    const canvas = document.getElementById('captureCanvas');
+    if (!video.videoWidth) return;
+    
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.5);
+    
+    try {
+      const res = await fetch('/api/interviews/session/analyze_frame', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: dataUrl })
+      });
+      const data = await res.json();
+      if (data.success) {
+        visionContext = data.observation;
+      }
+    } catch (e) {}
+  }
+
+  async function endInterview() {
+    clearInterval(timerInterval);
+    clearInterval(frameInterval);
+    document.getElementById('chatInput').disabled = true;
+    document.getElementById('btnSend').disabled = true;
+    
+    const video = document.getElementById('interviewCam');
+    if (video.srcObject) {
+      video.srcObject.getTracks().forEach(track => track.stop());
+    }
+
+    document.getElementById('reviewModal').style.display = 'flex';
+    document.getElementById('reviewContent').innerHTML = "Generating comprehensive feedback on your technical skills, body language, and expressions... Please wait.";
+
+    try {
+      const res = await fetch('/api/interviews/session/end', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: chatMessages })
+      });
+      const data = await res.json();
+      if (data.success) {
+        let html = data.review.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+        document.getElementById('reviewContent').innerHTML = html;
+      } else {
+        document.getElementById('reviewContent').innerHTML = "Failed to generate review. " + data.error;
+      }
+    } catch (e) {
+      document.getElementById('reviewContent').innerHTML = "Error generating review.";
+    }
+  }
+
+  window.addEventListener('load', () => {
+    initCamera();
+    startTimer();
+  });
+
+</script>
   <style>
     /* Reset & Base */
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -87,8 +178,7 @@
       
       <div class="topbar-right">
         <div id="timerDisplay" style="font-weight: 700; color: var(--warning); background: rgba(255, 200, 87, 0.1); padding: 6px 12px; border-radius: var(--radius); font-variant-numeric: tabular-nums;">05:00</div>
-        <button class="btn-end" onclick="endInterview()">
- id="btnEnd"><i data-lucide="square" style="width:14px;height:14px;"></i> End Interview</button>
+        <button class="btn-end" id="btnEnd" onclick="endInterview()"><i data-lucide="square" style="width:14px;height:14px;"></i> End Interview</button>
       </div>
     </div>
 
@@ -188,7 +278,8 @@
         body: JSON.stringify({
           topic: topic,
           messages: chatMessages,
-          code: '' // No code in pure chat
+          code: '',
+          vision_context: visionContext
         })
       });
       const data = await res.json();
@@ -230,6 +321,97 @@
   function escHtml(s) {
     return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/\n/g, '<br>');
   }
+
+  let visionContext = "";
+  let interviewDuration = 300; // 5 minutes
+  let timerInterval = null;
+  let frameInterval = null;
+
+  async function initCamera() {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      document.getElementById('interviewCam').srcObject = stream;
+      frameInterval = setInterval(captureAndAnalyzeFrame, 20000);
+    } catch (err) {
+      console.error("Camera access denied:", err);
+    }
+  }
+
+  function startTimer() {
+    const display = document.getElementById('timerDisplay');
+    timerInterval = setInterval(() => {
+      interviewDuration--;
+      let m = Math.floor(interviewDuration / 60);
+      let s = interviewDuration % 60;
+      display.textContent = (m < 10 ? '0'+m : m) + ':' + (s < 10 ? '0'+s : s);
+      if (interviewDuration <= 0) {
+        clearInterval(timerInterval);
+        endInterview();
+      }
+    }, 1000);
+  }
+
+  async function captureAndAnalyzeFrame() {
+    const video = document.getElementById('interviewCam');
+    const canvas = document.getElementById('captureCanvas');
+    if (!video.videoWidth) return;
+    
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    const dataUrl = canvas.toDataURL('image/jpeg', 0.5);
+    
+    try {
+      const res = await fetch('/api/interviews/session/analyze_frame', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ image: dataUrl })
+      });
+      const data = await res.json();
+      if (data.success) {
+        visionContext = data.observation;
+      }
+    } catch (e) {}
+  }
+
+  async function endInterview() {
+    clearInterval(timerInterval);
+    clearInterval(frameInterval);
+    document.getElementById('chatInput').disabled = true;
+    document.getElementById('btnSend').disabled = true;
+    
+    const video = document.getElementById('interviewCam');
+    if (video.srcObject) {
+      video.srcObject.getTracks().forEach(track => track.stop());
+    }
+
+    document.getElementById('reviewModal').style.display = 'flex';
+    document.getElementById('reviewContent').innerHTML = "Generating comprehensive feedback on your technical skills, body language, and expressions... Please wait.";
+
+    try {
+      const res = await fetch('/api/interviews/session/end', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: chatMessages })
+      });
+      const data = await res.json();
+      if (data.success) {
+        let html = data.review.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+        document.getElementById('reviewContent').innerHTML = html;
+      } else {
+        document.getElementById('reviewContent').innerHTML = "Failed to generate review. " + data.error;
+      }
+    } catch (e) {
+      document.getElementById('reviewContent').innerHTML = "Error generating review.";
+    }
+  }
+
+  window.addEventListener('load', () => {
+    initCamera();
+    startTimer();
+  });
+
 </script>
 
   <!-- Review Modal -->
