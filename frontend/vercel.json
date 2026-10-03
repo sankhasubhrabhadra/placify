@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://placify-yfvb.onrender.com/api/$1"
+      "destination": "https://argument-servers-route-castle.trycloudflare.com/api/$1"
     }
   ]
 }
