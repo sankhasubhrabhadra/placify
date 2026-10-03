@@ -46,8 +46,8 @@ app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Groq Client
 GROQ_API_KEY = os.environ.get('GROQ_API_KEY', '')
-GROQ_MODEL = os.environ.get('GROQ_MODEL', 'openai/gpt-oss-20b')
-GROQ_FALLBACK_MODEL = os.environ.get('GROQ_FALLBACK_MODEL', 'openai/gpt-oss-120b')
+GROQ_MODEL = os.environ.get('GROQ_MODEL', 'llama-3.1-8b-instant')
+GROQ_FALLBACK_MODEL = os.environ.get('GROQ_FALLBACK_MODEL', 'llama-3.1-70b-versatile')
 groq_client = None
 if GROQ_AVAILABLE and GROQ_API_KEY:
     groq_client = Groq(api_key=GROQ_API_KEY)
