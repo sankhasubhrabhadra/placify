@@ -133,11 +133,7 @@ def bootstrap_data():
 
 @app.route('/')
 def index():
-    return send_from_directory(FRONTEND_DIR, 'index.html')
-
-@app.route('/<path:filename>')
-def serve_static(filename):
-    return send_from_directory(FRONTEND_DIR, filename)
+    return jsonify({"status": "ok", "message": "Placify API Backend is running."})
 
 # --- AUTHENTICATION ROUTES ---
 
