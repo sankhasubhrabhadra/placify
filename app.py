@@ -611,31 +611,40 @@ def interview_session_chat():
         )
     else:
         system_prompt = (
-            f"You are an interviewer at a top tech company conducting a conversational interview on the topic: {topic}. "
-            "Act like a real interviewer: ask one question at a time, wait for the candidate's response, and ask probing follow-up questions. "
-            "Be concise, professional, and do not break character. Keep your responses under 150 words."
+            f"You are a strict, professional interviewer at a top tech company conducting an interview on: {topic}. "
+            "CRITICAL RULES: "
+            "1. YOU ARE THE INTERVIEWER, the user is the candidate. "
+            "2. YOU MUST ASK THE QUESTIONS. Never ask the candidate to ask you a question. "
+            "3. Ask one question at a time, wait for the candidate to answer, then evaluate or ask a follow-up. "
+            "4. Keep your responses under 100 words. Be concise."
         )
         
-    # Ask Groq (we pass the entire message history to groq, but since ask_groq only takes system_prompt + user_prompt, we format the history)
-    # Since ask_groq is a helper that just takes prompt and message, let's construct a prompt with history
-    history_text = ""
-    for m in messages[:-1]:
-        role = "Interviewer" if m['role'] == 'assistant' else "Candidate"
-        history_text += f"{role}: {m['content']}\n"
-        
-    last_user_message = messages[-1]['content']
+    # Directly format messages for Ollama API to avoid role confusion
+    ollama_messages = [{"role": "system", "content": final_prompt}]
     
-    vision_context = data.get('vision_context', '')
-    final_prompt = system_prompt
-    if vision_context:
-        final_prompt += f"\n\n[SYSTEM OBSERVATION: {vision_context} - If they look unprofessional, nervous, or distracted, subtly call it out as a real interviewer would.]"
-    if history_text:
-        final_prompt += f"\n\nChat History:\n{history_text}"
+    # Pass actual message array
+    for m in messages:
+        # Ensure roles map to what Ollama expects: 'user' or 'assistant'
+        role = 'assistant' if m['role'] == 'assistant' else 'user'
+        ollama_messages.append({"role": role, "content": m['content']})
         
-    response_text = ask_groq(final_prompt, last_user_message)
-    if response_text is None:
+    payload = {
+        "model": os.environ.get('OLLAMA_MODEL', 'qwen2.5:1.5b'),
+        "messages": ollama_messages,
+        "stream": False,
+        "options": {
+            "temperature": 0.7
+        }
+    }
+    
+    try:
+        response = requests.post("http://localhost:11434/api/chat", json=payload, timeout=60)
+        response.raise_for_status()
+        response_text = response.json()['message']['content'].strip()
+        return jsonify({'success': True, 'response': response_text})
+    except Exception as e:
+        app.logger.error(f"Chat error: {e}")
         return jsonify({'success': False, 'error': 'AI service is temporarily unavailable.'}), 503
-    return jsonify({'success': True, 'response': response_text})
 
 
 # RESUME
