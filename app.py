@@ -619,6 +619,12 @@ def interview_session_chat():
             "4. Keep your responses under 100 words. Be concise."
         )
         
+
+    vision_context = data.get('vision_context', '')
+    final_prompt = system_prompt
+    if vision_context:
+        final_prompt += f"\n\n[SYSTEM OBSERVATION: {vision_context} - If they look unprofessional, nervous, or distracted, subtly call it out as a real interviewer would.]"
+        
     # Directly format messages for Ollama API to avoid role confusion
     ollama_messages = [{"role": "system", "content": final_prompt}]
     
