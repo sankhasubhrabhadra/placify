@@ -1,49 +1,30 @@
-# Placify (Resume Scanner)
+# Placify: AI Interviewer & Learning Platform
 
-Small static site for coding practice and a built-in Resume Scanner.
+Placify is a comprehensive platform designed to help candidates prepare for technical interviews. It features AI-driven mock interviews, posture analysis, Leetcode-style coding practice, and skill simulations.
 
-## Overview
+## Architecture
 
-- Replaced the previous Job Board with a client-side Resume Scanner available at `jobs.html`.
-- Scanner supports uploading PDF or plain-text resumes and pasting resume text.
-- PDF text extraction uses `pdf.js` loaded from a public CDN.
+- **Frontend**: A sleek dashboard deployed on Vercel.
+- **Backend**: A local Python Flask API.
+- **AI Models**: Runs locally using Ollama (`qwen2.5:1.5b` for chat, `moondream` for vision analysis).
+- **Networking**: Connects Vercel to the local backend using a Cloudflare Quick Tunnel.
 
-## Key files
+## Features
 
-- `index.html` — Dashboard
-- `jobs.html` — Resume Scanner page (upload/paste and scan)
-- `script.js` — Application scripts; includes resume parsing and pdf.js integration
-- `style.css`, `style-additions.css` — Styles
+- **AI Mock Interviews**: Pair programming and conversational interviews powered by a local LLM.
+- **Vision & Posture Analysis**: The frontend captures webcam frames and uses local Vision AI to provide feedback on your body language and professionalism during the interview.
+- **Learning Roadmaps**: Explore curated paths for Data Structures & Algorithms, Frontend Architecture, and more.
+- **Coding Practice**: A built-in code editor for solving technical problems.
 
-## Run locally
+## Setup & Running Locally
 
-Serve the folder with a simple static server and open `jobs.html` in your browser.
-
-Using Python 3 built-in server:
-
-```bash
-python -m http.server 8080
-```
-
-Or using `http-server` (npm):
-
-```bash
-npx http-server . -p 8080
-```
-
-Then open: http://localhost:8080/jobs.html
-
-## Usage
-
-- Upload a `.pdf` or `.txt` resume, or paste text into the textarea.
-- Click `Scan Resume` to extract name (heuristic), email, phone, and common skills.
-- Results are shown on the page; the scanner is intentionally lightweight and client-side.
-
-## Notes & next steps
-
-- PDF extraction relies on an external CDN for `pdf.js`; offline use requires bundling the library locally.
-- Currently supports PDF and plain text only. Adding DOCX parsing, improved name detection, and exporting parsed JSON are straightforward improvements.
-
-## License
-
-This repo contains example code; adapt and reuse as needed.
+1. **Start Ollama**: Ensure `ollama serve` is running and you have pulled `qwen2.5:1.5b` and `moondream`.
+2. **Start Flask**:
+   ```bash
+   python app.py
+   ```
+3. **Start Cloudflare Tunnel**:
+   ```bash
+   cloudflared tunnel --url http://localhost:5000 --protocol http2
+   ```
+4. **Update Frontend**: Update `frontend/vercel.json` with the new Cloudflare tunnel URL generated in step 3. Push the changes to GitHub to trigger a Vercel deployment.

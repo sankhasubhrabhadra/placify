@@ -13,7 +13,6 @@ import json
 import re
 import datetime
 from werkzeug.utils import secure_filename
-from backend.resume_processor import extract_text, scan_resume_text, cross_check_skills
 from backend.engine import select_hr_questions, select_coding_questions, score_coding_answers, execute_code
 from backend.scoring_logic import generate_explanation, calculate_confidence_score, determine_next_stage
 
@@ -653,40 +652,6 @@ def interview_session_chat():
         return jsonify({'success': False, 'error': 'AI service is temporarily unavailable.'}), 503
 
 
-# RESUME
-@app.route('/api/resume/scan', methods=['POST'])
-def scan_resume():
-    try:
-        file = request.files.get('resume')
-        text = request.form.get('text', '')
-        if file:
-            filename = secure_filename(file.filename)
-            temp_path = os.path.join(tempfile.gettempdir(), f'{uuid.uuid4()}_{filename}')
-            file.save(temp_path)
-            try:
-                text = extract_text(temp_path)
-            finally:
-                if os.path.exists(temp_path):
-                    os.remove(temp_path)
-        result = scan_resume_text(text, {'skills': ['python','django','fastapi','sql','react','javascript'], 'min_exp': 2})
-        ai_feedback = None
-        if text:
-            ai_feedback = ask_groq(
-                'You are a senior technical recruiter. Review the resume and provide actionable feedback in 3 bullet points.',
-                f'Resume:\n{text[:2000]}\n\nGive 3 specific improvement tips.')
-            if ai_feedback is None:
-                return jsonify({'success': False, 'error': 'AI service is temporarily unavailable.'}), 503
-        
-        # Persist to user.json for the explanation engine
-        user = get_candidate_data(session.get('user_id', 1))
-        user['candidate_skills'] = result.get('skills_found', [])
-        user['resume_score'] = result.get('match_score', 0)
-        c_id = session.get('user_id', 1)
-        save_candidate_data(c_id, user)
-
-        return jsonify({'success': True, **result, 'ai_feedback': ai_feedback, 'candidate_id': c_id})
-    except Exception as e:
-        return jsonify({'success': False, 'error': str(e)}), 500
 
 # USER/AUTH
 @app.route('/api/user/profile', methods=['GET', 'POST'])
