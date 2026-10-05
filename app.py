@@ -848,9 +848,7 @@ def simulate_skill_impact(candidate_id):
         'recommendations': impacts
     })
 
-if __name__ == '__main__':
-    bootstrap_data()
-    app.run(debug=True, port=5000)
+
 
 
 @app.route('/api/interviews/session/analyze_frame', methods=['POST'])
@@ -921,3 +919,7 @@ def end_interview():
     save_json(path, iv_data)
     
     return jsonify({'success': True, 'review': response_text})
+
+if __name__ == '__main__':
+    bootstrap_data()
+    app.run(debug=True, port=5000)
