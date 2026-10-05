@@ -209,7 +209,7 @@ async function initInterviews() {
               <span class="font-medium">${p.topic}</span>
               <span class="text-secondary" style="font-size: 0.75rem;">${p.date} • Rating: ${p.rating}</span>
             </div>
-            <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;">View Feedback</button>
+            <button class="btn btn-outline" style="padding: 0.25rem 0.5rem; font-size: 0.75rem;" onclick="viewFeedback(${p.id})">View Feedback</button>
           </div>
         `).join('');
         lucide.createIcons();
@@ -533,4 +533,48 @@ window.handleLogout = async function() {
   } catch (e) {
     console.error(e);
   }
+};
+
+
+window.openScheduleModal = function() {
+  document.getElementById('scheduleModal').classList.add('open');
+};
+window.closeScheduleModal = function() {
+  document.getElementById('scheduleModal').classList.remove('open');
+};
+window.submitSchedule = async function() {
+  const topic = document.getElementById('scheduleTopic').value;
+  try {
+    const res = await fetch('/api/interviews/schedule', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ topic: topic })
+    });
+    const data = await res.json();
+    if(data.success) {
+      window.location.reload();
+    }
+  } catch(e) { console.error(e); }
+};
+
+window.viewFeedback = async function(id) {
+  document.getElementById('feedbackModal').classList.add('open');
+  document.getElementById('feedbackContent').innerHTML = "Loading feedback...";
+  lucide.createIcons();
+  
+  try {
+    const res = await fetch('/api/interviews/' + id + '/feedback');
+    const data = await res.json();
+    if(data.success && data.feedback) {
+      let html = data.feedback.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');
+      document.getElementById('feedbackContent').innerHTML = html;
+    } else {
+      document.getElementById('feedbackContent').innerHTML = "No feedback generated for this interview yet.";
+    }
+  } catch(e) {
+    document.getElementById('feedbackContent').innerHTML = "Error loading feedback.";
+  }
+};
+window.closeFeedbackModal = function() {
+  document.getElementById('feedbackModal').classList.remove('open');
 };

@@ -867,6 +867,7 @@ def analyze_frame():
 def end_interview():
     data = request.json or {}
     messages = data.get('messages', [])
+    topic = data.get('topic', 'General')
     if not messages:
         return jsonify({'success': False, 'error': 'No messages'}), 400
         
@@ -890,4 +891,18 @@ def end_interview():
     if response_text is None:
         return jsonify({'success': False, 'error': 'AI service is temporarily unavailable.'}), 503
         
+    # Save the generated review
+    import datetime
+    path = os.path.join(INTERVIEWS_DIR, 'sessions.json')
+    iv_data = load_json(path, {'upcoming': [], 'past': []})
+    new_id = max([i.get('id',0) for i in iv_data.get('upcoming',[]) + iv_data.get('past',[])], default=0) + 1
+    iv_data['past'].insert(0, {
+        'id': new_id, 
+        'topic': topic, 
+        'date': datetime.datetime.now().strftime('%B %d, %Y'), 
+        'rating': 'N/A', 
+        'feedback': response_text
+    })
+    save_json(path, iv_data)
+    
     return jsonify({'success': True, 'review': response_text})

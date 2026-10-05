@@ -78,7 +78,7 @@
         <div class="dashboard-grid">
           <div class="flex justify-between items-center mb-4">
             <h2 class="card-title" style="font-size: 1.5rem;">Mock Interviews</h2>
-            <button class="btn btn-primary">Schedule Interview</button>
+            <button class="btn btn-primary" onclick="openScheduleModal()">Schedule Interview</button>
           </div>
 
           <div class="grid grid-cols-2 gap-6">
@@ -113,5 +113,39 @@
   </div>
 
   <script src="script.js"></script>
+
+  <!-- Schedule Interview Modal -->
+  <div id="scheduleModal" class="modal-overlay">
+    <div class="modal-content" style="text-align: left;">
+      <h2 style="color:var(--txt); margin-bottom: 20px;">Schedule Interview</h2>
+      <div style="margin-bottom: 16px;">
+        <label style="display:block; margin-bottom: 8px; color:var(--txt2);">Select Topic</label>
+        <select id="scheduleTopic" class="chat-input" style="width:100%; border-radius: 8px; background:var(--bg);">
+          <option>System Design</option>
+          <option>Data Structures & Algorithms</option>
+          <option>Frontend Architecture</option>
+          <option>Behavioral</option>
+        </select>
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:12px;">
+        <button class="btn btn-outline" onclick="closeScheduleModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="submitSchedule()">Schedule</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Feedback Modal -->
+  <div id="feedbackModal" class="modal-overlay">
+    <div class="modal-content" style="text-align: left; max-width: 700px; max-height: 80vh; display:flex; flex-direction:column;">
+      <div style="display:flex; justify-content:space-between; align-items:center; border-bottom: 1px solid var(--border); padding-bottom: 16px; margin-bottom: 16px;">
+        <h2 style="color:var(--txt); margin:0;">Interview Feedback</h2>
+        <button onclick="closeFeedbackModal()" style="background:none; border:none; color:var(--txt2); cursor:pointer;"><i data-lucide="x"></i></button>
+      </div>
+      <div id="feedbackContent" style="overflow-y:auto; line-height:1.6; color:var(--txt2); white-space:pre-wrap;">
+        Loading...
+      </div>
+    </div>
+  </div>
+
 </body>
 </html>
