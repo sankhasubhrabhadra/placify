@@ -6,64 +6,71 @@
 
 ---
 
-Placify is a comprehensive, local-first platform designed to help software engineers prepare for technical interviews. By leveraging powerful local Large Language Models (LLMs) and Vision AI, Placify offers an immersive, privacy-focused mock interview experience right from your own hardware.
+## About Placify
 
-## 📚 Platform Sections
+Placify is an AI-powered talent intelligence platform that connects every stage 
+of interview and career prep into one place, instead of leaving candidates to 
+juggle separate tools for each step.
 
-Placify is organized into several core areas to give you a complete, end-to-end interview prep experience:
+### What it does
 
-- 🏠 **Dashboard (`index.html`)**: The central hub of your prep journey. Here you can view your overall progress, recent activity, upcoming scheduled mock interviews, and your aggregate technical scores.
-- 💻 **Problems (`problems.html`)**: A LeetCode-style environment with an integrated code editor. Browse algorithmic challenges, write your solution directly in the browser, and run against test cases.
-- 🗺️ **Learning Paths (`learning.html`)**: Structured curriculum roadmaps (like Data Structures, Frontend, or System Design) to guide your study. Track your progress node-by-node.
-- 🎙️ **Mock Interviews (`interviews.html` & `interview_room.html`)**: The flagship feature. Schedule an interview on any topic, and enter a live chat room with a local AI. The AI asks you questions one-by-one, while your webcam analyzes your posture and expressions in real-time. End the interview to receive a comprehensive scorecard.
-- 🧠 **Skill Simulator (`simulator.html`)**: Simulates rapid-fire technical questions tailored to specific roles or tech stacks, allowing you to quickly gauge your readiness in specialized domains without committing to a full mock interview.
-*(Note: The legacy "Resume Scanner" feature has been deprecated and removed to maintain focus on live interview and coding performance).*
+- **AI Mock Interviews** — live simulated technical and HR interview sessions with AI-generated questions, feedback, and real-time webcam posture/expression analysis.
+- **Coding Problem Practice** — a structured problem bank with an integrated code editor for sandbox execution.
+- **Skill Simulator** — a "what if" tool that simulates rapid-fire technical questions tailored to specific roles to help you gauge readiness quickly.
+- **Learning Roadmaps** — personalized study paths tied directly to identified skill gaps (e.g., Data Structures, Frontend Architecture).
+- **AI Coach** — a conversational assistant available throughout the platform for hints, guidance, and prep questions.
 
-## 🏗️ Architecture
+These aren't disconnected features — they all feed into one shared candidate 
+profile and one explainable scoring engine.
 
-Placify is designed to be fully self-hosted, keeping your data and webcam feeds entirely private.
+### What makes it different
 
-- **Frontend**: A sleek, modern dashboard hosted on [Vercel](https://vercel.com).
-- **Backend API**: A lightweight `Flask` server running locally on your machine.
-- **AI Engine**: Powered entirely by [Ollama](https://ollama.ai/).
-  - `qwen2.5:1.5b`: Lightning-fast model handling all interview dialogue and scorecard generation.
-  - `moondream`: A compact vision model for analyzing webcam frames.
-- **Networking**: A Cloudflare Quick Tunnel securely connects the Vercel frontend to your local Flask backend.
+- **Verified, not just claimed** — skills are cross-checked against 
+  the candidate's actual solved-problem history from the coding practice 
+  module, instead of trusting text at face value.
+- **Explainable, not just scored** — every decision comes with a confidence 
+  breakdown and named reasons, drawing on coding performance, and 
+  interview signals together, instead of a single opaque number.
+- **Prescriptive, not just descriptive** — a "what if I learn X" simulator 
+  shows the marginal score impact of closing any specific skill gap, and 
+  routes directly into the matching learning roadmap.
+- **One connected loop** — practice → mock interview → coach → 
+  reassess, all on the same profile, instead of separate disconnected tools.
 
-## 🚀 Getting Started
+### Problem it addresses
 
-To run Placify locally on your machine, follow these steps:
+Job prep today is fragmented across coding practice sites, interview prep tools, and learning platforms that don't talk to each other. Rejections happen with no explanation, interview practice is either unstructured or purely mechanical, and skill-gap advice is generic rather than tied to a specific role or a candidate's actual demonstrated performance.
 
-### 1. Start the Local AI Engine
-Ensure you have Ollama installed, and pull the required models:
-```bash
-ollama run qwen2.5:1.5b
-ollama run moondream
-```
-Once pulled, keep the Ollama server running:
-```bash
-ollama serve
-```
+### Who it's for
 
-### 2. Boot up the Backend
-Navigate to your Placify directory and start the Flask API:
-```bash
-python app.py
-```
-*(The server will run on `http://localhost:5000`)*
+- **Candidates** — especially students at colleges with limited access to structured career guidance or mock-interview practice
+- **Recruiters/hiring teams** — who need fast, defensible, auditable shortlisting decisions
+- **Educational institutions** — who need aggregate skill-gap visibility to inform curriculum
 
-### 3. Expose the Backend Securely
-To allow the Vercel frontend to talk to your local backend, open a new terminal and run:
-```bash
-cloudflared tunnel --url http://localhost:5000 --protocol http2
-```
-*Note: Copy the generated `https://*.trycloudflare.com` URL.*
+### Tech stack
 
-### 4. Connect the Frontend
-Open the `frontend/vercel.json` file in this repository. Replace the `destination` URL with your newly generated Cloudflare tunnel link. 
-Commit and push the changes to trigger a Vercel redeployment.
+- **Backend:** Flask (Python), modular engines for coding assessment, interview logic, scoring, and explanation.
+- **AI:** Local Ollama engine. Uses `qwen2.5:1.5b` for lightning-fast interview generation and `moondream` for local webcam/vision posture analysis—keeping all data entirely private.
+- **Security:** Sandboxed code execution (memory-capped, network-restricted) for the practice module.
+- **Frontend:** Vanilla HTML/CSS/JS + Chart.js for data visualization.
+- **Deployment:** Vercel (frontend) proxied to the local backend using a secure Cloudflare Quick Tunnel (`cloudflared`).
 
 ---
-<div align="center">
-  <i>Built with Flask, Vanilla JS, and Ollama. Happy Interviewing! 🎉</i>
-</div>
+
+## 🚀 Setup & Running Locally
+
+1. **Start the Local AI Engine**: Pull the models and start Ollama:
+   ```bash
+   ollama run qwen2.5:1.5b
+   ollama run moondream
+   ollama serve
+   ```
+2. **Boot up the Backend**: Start the Flask API:
+   ```bash
+   python app.py
+   ```
+3. **Expose the Backend Securely**: Run a Cloudflare tunnel:
+   ```bash
+   cloudflared tunnel --url http://localhost:5000 --protocol http2
+   ```
+4. **Connect the Frontend**: Update `frontend/vercel.json` with your generated Cloudflare URL, and deploy via Vercel.
