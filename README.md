@@ -8,13 +8,16 @@
 
 Placify is a comprehensive, local-first platform designed to help software engineers prepare for technical interviews. By leveraging powerful local Large Language Models (LLMs) and Vision AI, Placify offers an immersive, privacy-focused mock interview experience right from your own hardware.
 
-## ✨ Key Features
+## 📚 Platform Sections
 
-- 🤖 **Interactive Mock Interviews**: Engage in back-and-forth technical interviews on any topic (System Design, Frontend, DSA).
-- 📸 **Vision AI Posture Analysis**: The frontend securely captures webcam frames during your interview. A local Vision AI model analyzes your body language, eye contact, and professionalism to give you actionable feedback.
-- 🎯 **Automated Scorecards**: After every interview, receive a detailed breakdown of your technical skills, areas for improvement, and presentation.
-- 🗺️ **Learning Roadmaps**: Follow curated paths for Data Structures, Algorithms, and System Architecture.
-- 💻 **Integrated Code Editor**: Practice algorithmic problems directly in the browser.
+Placify is organized into several core areas to give you a complete, end-to-end interview prep experience:
+
+- 🏠 **Dashboard (`index.html`)**: The central hub of your prep journey. Here you can view your overall progress, recent activity, upcoming scheduled mock interviews, and your aggregate technical scores.
+- 💻 **Problems (`problems.html`)**: A LeetCode-style environment with an integrated code editor. Browse algorithmic challenges, write your solution directly in the browser, and run against test cases.
+- 🗺️ **Learning Paths (`learning.html`)**: Structured curriculum roadmaps (like Data Structures, Frontend, or System Design) to guide your study. Track your progress node-by-node.
+- 🎙️ **Mock Interviews (`interviews.html` & `interview_room.html`)**: The flagship feature. Schedule an interview on any topic, and enter a live chat room with a local AI. The AI asks you questions one-by-one, while your webcam analyzes your posture and expressions in real-time. End the interview to receive a comprehensive scorecard.
+- 🧠 **Skill Simulator (`simulator.html`)**: Simulates rapid-fire technical questions tailored to specific roles or tech stacks, allowing you to quickly gauge your readiness in specialized domains without committing to a full mock interview.
+*(Note: The legacy "Resume Scanner" feature has been deprecated and removed to maintain focus on live interview and coding performance).*
 
 ## 🏗️ Architecture
 
