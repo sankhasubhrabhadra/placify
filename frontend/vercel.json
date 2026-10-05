@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://argument-servers-route-castle.trycloudflare.com/api/$1"
+      "destination": "https://row-southern-surgeon-pendant.trycloudflare.com/api/$1"
     }
   ]
 }
