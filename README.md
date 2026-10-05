@@ -1,5 +1,4 @@
 <div align="center">
-  <img src="https://raw.githubusercontent.com/lucide-icons/lucide/main/icons/brain-circuit.svg" width="80" height="80" alt="Placify Logo">
   <h1>🚀 Placify</h1>
   <p><strong>Your Personal AI Interviewer & Technical Learning Platform</strong></p>
 </div>
