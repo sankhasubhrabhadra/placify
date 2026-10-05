@@ -82,7 +82,7 @@
       const res = await fetch('/api/interviews/session/end', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: chatMessages })
+        body: JSON.stringify({ messages: chatMessages, topic: topic, vision_context: visionContext })
       });
       const data = await res.json();
       if (data.success) {
@@ -393,7 +393,7 @@
       const res = await fetch('/api/interviews/session/end', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ messages: chatMessages })
+        body: JSON.stringify({ messages: chatMessages, topic: topic, vision_context: visionContext })
       });
       const data = await res.json();
       if (data.success) {
