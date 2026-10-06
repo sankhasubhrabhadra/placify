@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Start Placement Session - Placify</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style-additions.css" />
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+<body>
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon">
+            <i data-lucide="brain-circuit"></i>
+          </div>
+          <span>Placify</span>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="placement_session.html" class="nav-item active">
+          <i data-lucide="briefcase"></i>
+          <span>Final Placement Prep</span>
+        </a>
+        <a href="problems.html" class="nav-item">
+          <i data-lucide="code-2"></i>
+          <span>Problems</span>
+        </a>
+        <a href="learning.html" class="nav-item">
+          <i data-lucide="graduation-cap"></i>
+          <span>Learning Paths</span>
+        </a>
+        <a href="interviews.html" class="nav-item">
+          <i data-lucide="message-square"></i>
+          <span>Mock Interviews</span>
+        </a>
+        <a href="jobs.html" class="nav-item">
+          <i data-lucide="file-search"></i>
+          <span>Resume Scanner</span>
+        </a>
+        <a href="simulator.html" class="nav-item">
+          <i data-lucide="sparkles"></i>
+          <span>Skill Simulator</span>
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <a href="settings.html" class="nav-item">
+          <i data-lucide="settings"></i>
+          <span>Settings</span>
+        </a>
+      </div>
+    </div>
+    
+    <div class="main-content">
+      <header class="topbar">
+        <div class="search-container">
+          <i data-lucide="search" class="search-icon"></i>
+          <input type="text" class="search-input" placeholder="Search problems, topics..." />
+        </div>
+        <div class="topbar-actions">
+          <button class="btn btn-outline" style="border: none; background: transparent;"><i data-lucide="bell"></i></button>
+          <div class="avatar" style="background-color: var(--primary);">
+            <span>US</span>
+          </div>
+        </div>
+      </header>
+
+      <main class="content-area">
+        <div class="dashboard-grid">
+          <div class="flex justify-between items-center mb-4">
+            <h2 style="font-size: 1.5rem; font-weight: 600;">Start Final Placement Prep</h2>
+          </div>
+
+          <div class="grid grid-cols-1 gap-4">
+            <div class="card" style="max-width: 800px; margin: 0 auto; width: 100%;">
+              <h3 class="card-title mb-4">Configure Your Session</h3>
+              <p class="text-secondary" style="font-size: 0.9rem; margin-bottom: 1.5rem;">
+                Set up a persistent, adaptive prep session for your upcoming interview. Placify will orchestrate your study plan dynamically.
+              </p>
+
+              <form id="sessionForm">
+                <div class="flex flex-col gap-4 mb-4">
+                  <div class="grid grid-cols-2 gap-4">
+                    <div>
+                      <label for="company" class="form-label">Target Company</label>
+                      <input type="text" id="company" name="company" class="form-input" style="width: 100%; margin-top: 0.5rem;" placeholder="e.g., Google" required />
+                    </div>
+                    <div>
+                      <label for="role" class="form-label">Target Role</label>
+                      <input type="text" id="role" name="role" class="form-input" style="width: 100%; margin-top: 0.5rem;" placeholder="e.g., L4 Software Engineer" required />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label for="timeBudget" class="form-label">Available Time (Minutes)</label>
+                    <input type="number" id="timeBudget" name="timeBudget" class="form-input" style="width: 100%; margin-top: 0.5rem;" placeholder="e.g., 120" value="120" required />
+                  </div>
+
+                  <div>
+                    <label for="resumeFile" class="form-label">Upload Resume (PDF/TXT/DOCX)</label>
+                    <input type="file" id="resumeFile" name="resume" accept=".pdf,.txt,.docx" style="width: 100%; margin-top: 0.5rem;" required />
+                  </div>
+                  
+                  <div>
+                    <label for="studyMaterial" class="form-label">Upload Study Material (Optional)</label>
+                    <input type="file" id="studyMaterial" name="studyMaterial" accept=".txt,.pdf" style="width: 100%; margin-top: 0.5rem;" />
+                  </div>
+
+                  <div>
+                    <label for="strengths" class="form-label">Confidence / Strengths / Weaknesses (Optional)</label>
+                    <textarea id="strengths" name="strengths" rows="3" class="form-input" style="width: 100%; margin-top: 0.5rem;" placeholder="e.g., Strong in React, weak in Graph algorithms..."></textarea>
+                  </div>
+                  
+                  <div id="formError" class="text-secondary" style="color: #ef4444; display: none;"></div>
+                  
+                  <button type="submit" id="startBtn" class="btn btn-primary" style="margin-top: 1rem;">
+                    <i data-lucide="play" style="width: 18px; height: 18px; margin-right: 0.5rem;"></i>
+                    Initialize Session
+                  </button>
+                </div>
+              </form>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+    
+    document.getElementById('sessionForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      
+      const btn = document.getElementById('startBtn');
+      const err = document.getElementById('formError');
+      btn.disabled = true;
+      btn.innerHTML = '<i data-lucide="loader-2" class="spin" style="width:18px;height:18px;margin-right:0.5rem"></i> Processing...';
+      lucide.createIcons();
+      err.style.display = 'none';
+
+      try {
+        const formData = new FormData();
+        formData.append('company', document.getElementById('company').value);
+        formData.append('role', document.getElementById('role').value);
+        formData.append('timeBudget', document.getElementById('timeBudget').value);
+        formData.append('strengths', document.getElementById('strengths').value);
+        
+        const resumeFile = document.getElementById('resumeFile').files[0];
+        if(resumeFile) formData.append('resume', resumeFile);
+        
+        const studyMaterial = document.getElementById('studyMaterial').files[0];
+        if(studyMaterial) formData.append('studyMaterial', studyMaterial);
+
+        const res = await fetch('/api/placement-session/create', {
+          method: 'POST',
+          body: formData
+        });
+
+        const data = await res.json();
+        if(data.success) {
+          window.location.href = `session_dashboard.html?id=${data.session_id}`;
+        } else {
+          throw new Error(data.error || 'Failed to create session');
+        }
+      } catch (error) {
+        err.textContent = error.message;
+        err.style.display = 'block';
+        btn.disabled = false;
+        btn.innerHTML = '<i data-lucide="play" style="width:18px;height:18px;margin-right:0.5rem"></i> Initialize Session';
+        lucide.createIcons();
+      }
+    });
+  </script>
+</body>
+</html>

@@ -3,6 +3,12 @@ from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from backend.db import get_db_connection, init_db
 import os
+from backend.baseline_assessment import get_next_baseline_question, process_baseline_answer, compute_skill_gaps
+from backend.readiness import generate_readiness_report, simulate_what_if
+from backend.activities import generate_learning_content, process_learning_quiz_answer, generate_coding_challenge, submit_coding_challenge
+from backend.orchestrator import replan_roadmap
+from backend.placement_session import create_session, get_session, save_session
+import json
 from backend.resume_processor import extract_text, scan_resume_text, cross_check_skills
 import requests
 from dotenv import load_dotenv
@@ -932,6 +938,225 @@ def scan_resume():
         app.logger.error(f"Error scanning resume: {e}")
         return jsonify({'success': False, 'error': str(e)}), 500
 
+
+
+# PLACEMENT SESSION PHASE 2
+@app.route('/api/placement-session/create', methods=['POST'])
+def api_placement_session_create():
+    try:
+        company = request.form.get('company', '')
+        role = request.form.get('role', '')
+        time_budget = int(request.form.get('timeBudget', 120))
+        strengths = request.form.get('strengths', '')
+        
+        resume_file = request.files.get('resume')
+        study_material_file = request.files.get('studyMaterial')
+        
+        resume_text = ""
+        study_text = ""
+        
+        if resume_file:
+            filename = secure_filename(resume_file.filename)
+            import tempfile, uuid
+            temp_path = os.path.join(tempfile.gettempdir(), f'{uuid.uuid4()}_{filename}')
+            resume_file.save(temp_path)
+            try:
+                resume_text = extract_text(temp_path)
+            finally:
+                if os.path.exists(temp_path):
+                    os.remove(temp_path)
+                    
+        if study_material_file:
+            filename = secure_filename(study_material_file.filename)
+            temp_path = os.path.join(tempfile.gettempdir(), f'{uuid.uuid4()}_{filename}')
+            study_material_file.save(temp_path)
+            try:
+                study_text = extract_text(temp_path)
+            finally:
+                if os.path.exists(temp_path):
+                    os.remove(temp_path)
+
+        # Call ask_groq to extract role requirements
+        system_prompt = '''You are a highly analytical technical recruiter intelligence AI.
+Extract the role requirements (skills, languages, frameworks, CS fundamentals, behavioral expectations) 
+and any publicly-known interview pattern information for this company and role.
+
+CRITICAL REQUIREMENT (PER SECTION 5 OF SPEC):
+You must tag EVERY extracted skill/requirement with a confidence level (HIGH, MEDIUM, or LOW) and 
+provide the evidence that supports it (e.g. "Mentioned in study material", "Standard for L4 at Google", 
+"Commonly asked based on public interview patterns").
+DO NOT present speculation as fact. 
+
+Return your response AS A VALID JSON OBJECT exactly matching this schema:
+{
+  "extracted_requirements": [
+    {"skill": "Python", "confidence": "HIGH", "evidence": "..."}
+  ],
+  "interview_patterns": [
+    "string pattern 1", "string pattern 2"
+  ]
+}
+'''
+        user_prompt = f"Company: {company}\nRole: {role}\n"
+        if study_text:
+            user_prompt += f"Study Material/JD:\n{study_text[:3000]}\n"
+            
+        ai_response = ask_groq(system_prompt, user_prompt)
+        
+        # Parse JSON from ai_response
+        intel = {"extracted_requirements": [], "interview_patterns": []}
+        if ai_response:
+            try:
+                # Find JSON block if wrapped in markdown
+                if "```json" in ai_response:
+                    json_str = ai_response.split("```json")[1].split("```")[0].strip()
+                else:
+                    json_str = ai_response.strip()
+                parsed = json.loads(json_str)
+                
+                # Filter out claims without confidence tags
+                reqs = parsed.get("extracted_requirements", [])
+                valid_reqs = []
+                for r in reqs:
+                    if r.get("confidence") in ["HIGH", "MEDIUM", "LOW"]:
+                        valid_reqs.append(r)
+                
+                intel["extracted_requirements"] = valid_reqs
+                intel["interview_patterns"] = parsed.get("interview_patterns", [])
+                
+            except Exception as e:
+                app.logger.error(f"Failed to parse LLM JSON: {e}")
+                # Fallback empty structure
+                pass
+                
+        # Create session
+        candidate_id = str(session.get('user_id', 1))
+        session_data = create_session(candidate_id, company, role, time_budget)
+        
+        # Hydrate session with intel and candidate data
+        session_data["company_role_intelligence"] = intel
+        session_data["candidate"]["resume_data"] = {"raw_text": resume_text[:1000]} # Truncate for size
+        session_data["candidate"]["strengths_notes"] = strengths
+        
+        save_session(session_data["session_id"], session_data)
+        
+        return jsonify({"success": True, "session_id": session_data["session_id"]})
+        
+    except Exception as e:
+        app.logger.error(f"Error in create placement session: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/placement-session/<session_id>', methods=['GET'])
+def api_placement_session_get(session_id):
+    session_data = get_session(session_id)
+    if not session_data:
+        return jsonify({"success": False, "error": "Session not found"}), 404
+    return jsonify({"success": True, "session": session_data})
+
+
+# PLACEMENT SESSION PHASE 3 (BASELINE)
+@app.route('/api/placement-session/<session_id>/baseline/next', methods=['GET'])
+def api_placement_session_baseline_next(session_id):
+    try:
+        result = get_next_baseline_question(session_id, ask_groq)
+        if "error" in result:
+            return jsonify({"success": False, "error": result["error"]}), 500
+        return jsonify({"success": True, "result": result})
+    except Exception as e:
+        app.logger.error(f"Error in baseline next: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/placement-session/<session_id>/baseline/answer', methods=['POST'])
+def api_placement_session_baseline_answer(session_id):
+    try:
+        data = request.json
+        topic = data.get("topic")
+        difficulty = data.get("difficulty")
+        is_correct = data.get("is_correct")
+        mistakes = data.get("mistakes", [])
+        
+        gaps = process_baseline_answer(session_id, topic, difficulty, is_correct, mistakes, ask_groq)
+        return jsonify({"success": True, "skill_gaps": gaps})
+    except Exception as e:
+        app.logger.error(f"Error in baseline answer: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# PLACEMENT SESSION PHASE 4 (ORCHESTRATOR)
+@app.route('/api/placement-session/<session_id>/replan', methods=['POST'])
+def api_placement_session_replan(session_id):
+    try:
+        session_data = get_session(session_id)
+        if not session_data:
+            return jsonify({"success": False, "error": "Session not found"}), 404
+            
+        new_plan, reason = replan_roadmap(session_data)
+        
+        # Save state
+        save_session(session_id, session_data)
+        
+        return jsonify({
+            "success": True, 
+            "current_plan": new_plan,
+            "reason": reason
+        })
+    except Exception as e:
+        app.logger.error(f"Error in replan: {e}")
+        return jsonify({"success": False, "error": str(e)}), 500
+
+
+# PLACEMENT SESSION PHASE 5 (ACTIVITIES)
+@app.route('/api/placement-session/<session_id>/learning', methods=['GET'])
+def api_placement_session_learning(session_id):
+    topic = request.args.get('topic', 'General')
+    try:
+        content = generate_learning_content(session_id, topic, ask_groq)
+        if "error" in content:
+            return jsonify({"success": False, "error": content["error"]}), 500
+        return jsonify({"success": True, "content": content})
+    except Exception as e:
+        return jsonify({"success": False, "error": str(e)}), 500
+
+@app.route('/api/placement-session/<session_id>/learning/answer', methods=['POST'])
+def api_placement_session_learning_answer(session_id):
+    data = request.json
+    topic = data.get("topic")
+    is_correct = data.get("is_correct")
+    gaps = process_learning_quiz_answer(session_id, topic, is_correct, ask_groq)
+    return jsonify({"success": True, "skill_gaps": gaps})
+
+@app.route('/api/placement-session/<session_id>/coding', methods=['GET'])
+def api_placement_session_coding(session_id):
+    topic = request.args.get('topic', 'General')
+    question = generate_coding_challenge(topic)
+    return jsonify({"success": True, "question": question})
+
+@app.route('/api/placement-session/<session_id>/coding/submit', methods=['POST'])
+def api_placement_session_coding_submit(session_id):
+    data = request.json
+    topic = data.get("topic")
+    code_text = data.get("code")
+    feedback = submit_coding_challenge(session_id, topic, code_text, ask_groq)
+    # Give candidate a score bump for coding
+    process_baseline_answer(session_id, topic, "hard", True, [], ask_groq)
+    return jsonify({"success": True, "feedback": feedback})
+
+
+# PLACEMENT SESSION PHASE 6 (READINESS)
+@app.route('/api/placement-session/<session_id>/readiness-report', methods=['GET'])
+def api_placement_session_readiness(session_id):
+    report = generate_readiness_report(session_id)
+    if "error" in report:
+        return jsonify({"success": False, "error": report["error"]}), 500
+    return jsonify({"success": True, "report": report})
+
+@app.route('/api/placement-session/<session_id>/simulate', methods=['GET'])
+def api_placement_session_simulate(session_id):
+    skill = request.args.get('skill', '')
+    sim = simulate_what_if(session_id, skill)
+    if "error" in sim:
+        return jsonify({"success": False, "error": sim["error"]}), 500
+    return jsonify({"success": True, "simulation": sim})
 
 if __name__ == '__main__':
     bootstrap_data()

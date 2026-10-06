@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Session Dashboard - Placify</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style-additions.css" />
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    .plan-card {
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      margin-bottom: 0.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .plan-active {
+      border-color: var(--primary);
+      background-color: rgba(var(--primary-rgb), 0.05);
+    }
+    .plan-reason {
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 0.5rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="layout">
+    <div class="sidebar">
+      <div class="sidebar-header">
+        <div class="logo">
+          <div class="logo-icon"><i data-lucide="brain-circuit"></i></div>
+          <span>Placify</span>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+        <a href="placement_session.html" class="nav-item active"><i data-lucide="briefcase"></i><span>Final Placement Prep</span></a>
+      </nav>
+    </div>
+    
+    <div class="main-content">
+      <header class="topbar">
+        <div class="search-container"><i data-lucide="search" class="search-icon"></i><input type="text" class="search-input" placeholder="Search problems, topics..." /></div>
+        <div class="topbar-actions"><button class="btn btn-outline" style="border: none; background: transparent;"><i data-lucide="bell"></i></button></div>
+      </header>
+
+      <main class="content-area">
+        <div class="dashboard-grid">
+          <div class="flex justify-between items-center mb-4">
+            <h2 id="sessionHeader" style="font-size: 1.5rem; font-weight: 600;">Session Dashboard</h2>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div id="loadingState" class="card col-span-2">
+              <div class="flex items-center gap-2"><i data-lucide="loader-2" class="spin"></i> Loading session data...</div>
+            </div>
+            
+            <div id="intelligenceCol" style="display:none;" class="flex flex-col gap-4">
+              <div class="card">
+                <h3 class="card-title mb-4">Role Intelligence</h3>
+                <div id="requirementsList" class="flex flex-col gap-3"></div>
+              </div>
+            </div>
+            
+            <div id="planCol" style="display:none;" class="flex flex-col gap-4">
+              <div class="card">
+                <div class="flex justify-between items-center mb-4">
+                  <h3 class="card-title">Dynamic Roadmap</h3>
+                  <button id="replanBtn" class="btn btn-outline btn-sm" onclick="triggerReplan()"><i data-lucide="refresh-cw"></i> Re-plan</button>
+                </div>
+                
+                <div id="orchestratorReason" style="display:none; padding: 1rem; background: rgba(59, 130, 246, 0.1); color: #2563eb; border-radius: 8px; margin-bottom: 1rem; font-size: 0.9rem;">
+                  <i data-lucide="info" style="display:inline; width:16px; height:16px; margin-right:4px;"></i> 
+                  <span id="orchestratorReasonText"></span>
+                </div>
+                
+                <div id="planList" class="flex flex-col"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+    
+    const params = new URLSearchParams(window.location.search);
+    const sessionId = params.get('id');
+
+    async function loadSession() {
+      if(!sessionId) return;
+      
+      try {
+        const res = await fetch(`/api/placement-session/${sessionId}`);
+        const data = await res.json();
+        
+        if(!data.success) throw new Error(data.error || 'Failed to load session');
+        
+        const session = data.session;
+        document.getElementById('sessionHeader').textContent = `${session.target.role} @ ${session.target.company}`;
+        
+        // Render Intelligence
+        const reqContainer = document.getElementById('requirementsList');
+        reqContainer.innerHTML = '';
+        if(session.company_role_intelligence.extracted_requirements) {
+            session.company_role_intelligence.extracted_requirements.forEach(req => {
+            const confColor = req.confidence === 'HIGH' ? '#22c55e' : (req.confidence === 'MEDIUM' ? '#eab308' : '#ef4444');
+            reqContainer.innerHTML += `
+                <div style="border: 1px solid var(--border); border-radius: 8px; padding: 1rem;">
+                <div class="flex justify-between items-center mb-2">
+                    <strong>${req.skill}</strong>
+                    <span style="font-size: 0.75rem; background-color: ${confColor}20; color: ${confColor}; padding: 0.2rem 0.5rem; border-radius: 12px; font-weight: 600;">${req.confidence} CONFIDENCE</span>
+                </div>
+                </div>
+            `;
+            });
+        }
+        
+        renderPlan(session.current_plan);
+
+        document.getElementById('loadingState').style.display = 'none';
+        document.getElementById('intelligenceCol').style.display = 'flex';
+        document.getElementById('planCol').style.display = 'flex';
+        
+      } catch (error) {
+        document.getElementById('loadingState').innerHTML = `<div style="color: #ef4444">${error.message}</div>`;
+      }
+    }
+    
+    function renderPlan(plan) {
+      const planContainer = document.getElementById('planList');
+      planContainer.innerHTML = '';
+      
+      if(!plan || !plan.activities || plan.activities.length === 0) {
+        planContainer.innerHTML = '<div class="text-secondary text-sm">No plan generated yet. Click Re-plan to let the Orchestrator decide your first step.</div>';
+        return;
+      }
+      
+      // Reverse array so newest (active) is on top, or just show list. We will show normal list.
+      plan.activities.forEach(act => {
+        const isActive = act.status === 'active';
+        planContainer.innerHTML += `
+          <div class="plan-card ${isActive ? 'plan-active' : ''}" style="opacity: ${act.status === 'completed' ? '0.5' : '1'}">
+            <div>
+              <div class="flex items-center gap-2">
+                <strong>${act.type.replace('_', ' ').toUpperCase()}</strong>
+                ${isActive ? '<span style="font-size:0.7rem; background:var(--primary); color:white; padding:2px 6px; border-radius:4px;">ACTIVE</span>' : ''}
+              </div>
+              <div class="text-sm mt-1">Topic: <strong>${act.topic}</strong></div>
+              ${isActive && act.reason ? `<div class="plan-reason">${act.reason}</div>` : ''}
+            </div>
+            ${act.status === 'completed' ? '<i data-lucide="check-circle" style="color:#22c55e;"></i>' : ''}
+          </div>
+        `;
+      });
+      lucide.createIcons();
+    }
+    
+    async function triggerReplan() {
+      const btn = document.getElementById('replanBtn');
+      btn.innerHTML = '<i data-lucide="loader-2" class="spin"></i> Planning...';
+      
+      try {
+        const res = await fetch(`/api/placement-session/${sessionId}/replan`, { method: 'POST' });
+        const data = await res.json();
+        if(data.success) {
+          renderPlan(data.current_plan);
+          const reasonBox = document.getElementById('orchestratorReason');
+          document.getElementById('orchestratorReasonText').textContent = "Orchestrator: " + data.reason;
+          reasonBox.style.display = 'block';
+        }
+      } catch(e) {
+        alert(e);
+      }
+      btn.innerHTML = '<i data-lucide="refresh-cw"></i> Re-plan';
+      lucide.createIcons();
+    }
+    
+    loadSession();
+  </script>
+</body>
+</html>
