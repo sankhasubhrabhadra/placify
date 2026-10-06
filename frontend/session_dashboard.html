@@ -34,27 +34,72 @@
   </style>
 </head>
 <body>
-  <div class="layout">
-    <div class="sidebar">
+  <div class="layout-wrapper">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
       <div class="sidebar-header">
-        <div class="logo">
-          <div class="logo-icon"><i data-lucide="brain-circuit"></i></div>
-          <span>Placify</span>
-        </div>
+        <i data-lucide="code-2" class="text-primary mr-2"></i>
+        Placify
       </div>
       <nav class="sidebar-nav">
-        <a href="index.html" class="nav-item"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
-        <a href="placement_session.html" class="nav-item active"><i data-lucide="briefcase"></i><span>Final Placement Prep</span></a>
+        <a href="index.html" class="nav-item">
+          <i data-lucide="layout-dashboard"></i>
+          <span>Dashboard</span>
+        </a>
+        <a href="placement_session.html" class="nav-item active">
+          <i data-lucide="briefcase"></i>
+          <span>Final Placement Prep</span>
+        </a>
+        <a href="problems.html" class="nav-item">
+          <i data-lucide="code-2"></i>
+          <span>Problems</span>
+        </a>
+        <a href="learning.html" class="nav-item">
+          <i data-lucide="book-open"></i>
+          <span>Learning Paths</span>
+        </a>
+        <a href="interviews.html" class="nav-item">
+          <i data-lucide="message-square"></i>
+          <span>Mock Interviews</span>
+        </a>
+        <a href="jobs.html" class="nav-item">
+          <i data-lucide="file-search"></i>
+          <span>Resume Scanner</span>
+        </a>
+        <a href="simulator.html" class="nav-item">
+          <i data-lucide="sparkles"></i>
+          <span>Skill Simulator</span>
+        </a>
       </nav>
-    </div>
-    
+      <div class="sidebar-footer">
+        <a href="settings.html" class="nav-item">
+          <i data-lucide="settings"></i>
+          <span>Settings</span>
+        </a>
+      </div>
+    </aside>
+
+    <!-- Main Content Wrapper -->
     <div class="main-content">
-      <header class="topbar">
-        <div class="search-container"><i data-lucide="search" class="search-icon"></i><input type="text" class="search-input" placeholder="Search problems, topics..." /></div>
-        <div class="topbar-actions"><button class="btn btn-outline" style="border: none; background: transparent;"><i data-lucide="bell"></i></button></div>
+      
+      <!-- Top Nav -->
+      <header class="top-nav">
+        <div class="search-bar">
+          <i data-lucide="search" class="text-secondary"></i>
+          <input type="text" placeholder="Search problems, articles, or users..." />
+        </div>
+        <div class="user-actions">
+          <button class="icon-btn">
+            <i data-lucide="bell"></i>
+          </button>
+          <a href="#" class="avatar" style="text-decoration: none;">P</a>
+        </div>
       </header>
 
+      <!-- Content -->
       <main class="content-area">
+
         <div class="dashboard-grid">
           <div class="flex justify-between items-center mb-4">
             <h2 id="sessionHeader" style="font-size: 1.5rem; font-weight: 600;">Session Dashboard</h2>

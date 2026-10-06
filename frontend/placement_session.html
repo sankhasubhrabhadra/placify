@@ -14,15 +14,13 @@
   <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 <body>
-  <div class="layout">
-    <div class="sidebar">
+  <div class="layout-wrapper">
+    
+    <!-- Sidebar -->
+    <aside class="sidebar">
       <div class="sidebar-header">
-        <div class="logo">
-          <div class="logo-icon">
-            <i data-lucide="brain-circuit"></i>
-          </div>
-          <span>Placify</span>
-        </div>
+        <i data-lucide="code-2" class="text-primary mr-2"></i>
+        Placify
       </div>
       <nav class="sidebar-nav">
         <a href="index.html" class="nav-item">
@@ -38,7 +36,7 @@
           <span>Problems</span>
         </a>
         <a href="learning.html" class="nav-item">
-          <i data-lucide="graduation-cap"></i>
+          <i data-lucide="book-open"></i>
           <span>Learning Paths</span>
         </a>
         <a href="interviews.html" class="nav-item">
@@ -60,23 +58,28 @@
           <span>Settings</span>
         </a>
       </div>
-    </div>
-    
+    </aside>
+
+    <!-- Main Content Wrapper -->
     <div class="main-content">
-      <header class="topbar">
-        <div class="search-container">
-          <i data-lucide="search" class="search-icon"></i>
-          <input type="text" class="search-input" placeholder="Search problems, topics..." />
+      
+      <!-- Top Nav -->
+      <header class="top-nav">
+        <div class="search-bar">
+          <i data-lucide="search" class="text-secondary"></i>
+          <input type="text" placeholder="Search problems, articles, or users..." />
         </div>
-        <div class="topbar-actions">
-          <button class="btn btn-outline" style="border: none; background: transparent;"><i data-lucide="bell"></i></button>
-          <div class="avatar" style="background-color: var(--primary);">
-            <span>US</span>
-          </div>
+        <div class="user-actions">
+          <button class="icon-btn">
+            <i data-lucide="bell"></i>
+          </button>
+          <a href="#" class="avatar" style="text-decoration: none;">P</a>
         </div>
       </header>
 
+      <!-- Content -->
       <main class="content-area">
+
         <div class="dashboard-grid">
           <div class="flex justify-between items-center mb-4">
             <h2 style="font-size: 1.5rem; font-weight: 600;">Start Final Placement Prep</h2>
