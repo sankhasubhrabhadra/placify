@@ -2,7 +2,7 @@
   "rewrites": [
     {
       "source": "/api/(.*)",
-      "destination": "https://stainless-ddr-floppy-searched.trycloudflare.com/api/$1"
+      "destination": "https://offset-tagged-sustainable-vocal.trycloudflare.com/api/$1"
     }
   ]
 }
