@@ -1,86 +1,123 @@
 <div align="center">
+  <img src="https://via.placeholder.com/150x150/1F2937/FFA116?text=Placify" alt="Placify Logo" width="120" height="120" style="border-radius: 20px;">
+  <br/>
   <h1>🚀 Placify</h1>
-  <p><strong>Your Personal AI Interviewer & Technical Learning Platform</strong></p>
+  <p><strong>AI-Powered Talent Intelligence & Placement Preparation Platform</strong></p>
+  
+  <p>
+    <img src="https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white" alt="Python" />
+    <img src="https://img.shields.io/badge/JavaScript-F7DF1E?style=for-the-badge&logo=javascript&logoColor=black" alt="JavaScript" />
+    <img src="https://img.shields.io/badge/scikit_learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white" alt="Scikit-Learn" />
+    <img src="https://img.shields.io/badge/Ollama-000000?style=for-the-badge&logo=ollama&logoColor=white" alt="Ollama" />
+    <img src="https://img.shields.io/badge/Flask-000000?style=for-the-badge&logo=flask&logoColor=white" alt="Flask" />
+    <img src="https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white" alt="Vercel" />
+  </p>
+  
+  <p><em>Developed for the SAS CU Hackathon</em></p>
 </div>
 
 ---
 
-## About Placify
-
-Placify is an AI-powered talent intelligence platform that connects every stage 
-of interview and career prep into one place, instead of leaving candidates to 
-juggle separate tools for each step.
-
-### What it does
-
-- **AI Mock Interviews** — live simulated technical and HR interview sessions with AI-generated questions, feedback, and real-time webcam posture/expression analysis.
-- **Coding Problem Practice** — a structured problem bank with an integrated code editor for sandbox execution.
-- **Skill Simulator** — a "what if" tool that simulates rapid-fire technical questions tailored to specific roles to help you gauge readiness quickly.
-- **Learning Roadmaps** — personalized study paths tied directly to identified skill gaps (e.g., Data Structures, Frontend Architecture).
-- **AI Coach** — a conversational assistant available throughout the platform for hints, guidance, and prep questions.
-
-These aren't disconnected features — they all feed into one shared candidate 
-profile and one explainable scoring engine.
-
-### What makes it different
-
-- **Verified, not just claimed** — skills are cross-checked against 
-  the candidate's actual solved-problem history from the coding practice 
-  module, instead of trusting text at face value.
-- **Explainable, not just scored** — every decision comes with a confidence 
-  breakdown and named reasons, drawing on coding performance, and 
-  interview signals together, instead of a single opaque number.
-- **Prescriptive, not just descriptive** — a "what if I learn X" simulator 
-  shows the marginal score impact of closing any specific skill gap, and 
-  routes directly into the matching learning roadmap.
-- **One connected loop** — practice → mock interview → coach → 
-  reassess, all on the same profile, instead of separate disconnected tools.
-
-### Problem it addresses
-
-Job prep today is fragmented across coding practice sites, interview prep tools, and learning platforms that don't talk to each other. Rejections happen with no explanation, interview practice is either unstructured or purely mechanical, and skill-gap advice is generic rather than tied to a specific role or a candidate's actual demonstrated performance.
-
-### Who it's for
-
-- **Candidates** — especially students at colleges with limited access to structured career guidance or mock-interview practice
-- **Recruiters/hiring teams** — who need fast, defensible, auditable shortlisting decisions
-- **Educational institutions** — who need aggregate skill-gap visibility to inform curriculum
-
-### Tech stack
-
-- **Backend:** Flask (Python), modular engines for coding assessment, interview logic, scoring, and explanation.
-- **AI:** Local Ollama engine. Uses `qwen2.5:1.5b` for lightning-fast interview generation and `moondream` for local webcam/vision posture analysis—keeping all data entirely private.
-- **Security:** Sandboxed code execution (memory-capped, network-restricted) for the practice module.
-- **Frontend:** Vanilla HTML/CSS/JS + Chart.js for data visualization.
-- **Deployment:** Vercel (frontend) proxied to the local backend using a secure Cloudflare Quick Tunnel (`cloudflared`).
+## 📖 Table of Contents
+- [About Placify](#-about-placify)
+- [Key Features](#-key-features)
+- [The Data Pipeline & Machine Learning](#-the-data-pipeline--machine-learning)
+- [Technical Architecture](#-technical-architecture)
+- [Running Locally](#-running-locally)
 
 ---
 
-## 🚀 Setup & Running Locally
+## 🎯 About Placify
 
-1. **Start the Local AI Engine**: Pull the models and start Ollama:
-   ```bash
-   ollama run qwen2.5:1.5b
-   ollama run moondream
-   ollama serve
-   ```
-2. **Boot up the Backend**: Start the Flask API:
-   ```bash
-   python app.py
-   ```
-3. **Expose the Backend Securely**: Run a Cloudflare tunnel:
-   ```bash
-   cloudflared tunnel --url http://localhost:5000 --protocol http2
-   ```
-4. **Connect the Frontend**: Update `frontend/vercel.json` with your generated Cloudflare URL, and deploy via Vercel.
+Placement preparation today is highly fragmented. Candidates write code on LeetCode, parse resumes with ChatGPT, and guess their market value using generic Glassdoor data. Nothing talks to each other, and worse—candidates rarely know *which* skills actually drive salary hikes.
 
-## Data Pipeline
+**Placify** solves this by unifying resume scanning, job market analytics, mock interviews, and personalized learning paths into one seamless dashboard. Driven by empirical data (over **17,000 real-world job postings** and **employee success metrics**), Placify doesn't just score you—it tells you *exactly* what to do next to maximize your career trajectory.
 
-Placify is driven by real market and employee data. To update the market models and metrics:
+---
 
-1. Place the four dataset files (Analytics_Jobs.csv, DataScience_Jobs.csv, JDS_Skill_Traits.xlsx, SDS_Personality_Traits.xlsx) into /mnt/user-data/uploads (or update UPLOAD_DIR in scripts/prepare_data.py).
-2. Run the script:
-   `ash
-   python scripts/prepare_data.py
-   ``n3. This will generate aggregated JSON files inside rontend/data/ representing skill demand, salary expectations, logistic regression models for predicting success, and a resume scanner index.
-4. The frontend fetches these JSON files dynamically, so no backend restart is required.
+## ✨ Key Features
+
+### 📄 Local, Data-Driven Resume Scanner
+Extracts skills directly in your browser using `pdf.js` (no cloud upload required) and cross-references them against an index of 17,000+ real job postings. It calculates a realistic Fit Score, highlights missing high-demand skills, and predicts an estimated salary band.
+
+### 🧮 "What If" Skill Simulator
+Powered by a custom **Logistic Regression** model trained on Junior Data Scientist (JDS) traits. Adjust your technical skill sliders (Coding, Big Data, Maths/Stats) to see your real-time mathematical probability of securing a high salary hike, including the exact marginal gain of learning new skills.
+
+### 🧠 Behavioural Readiness & AI Mock Interviews
+Maps your "Big Five" personality traits to a Logistic Regression model trained on senior employee success data, providing percentile ranks and targeted development advice. Features live technical mock interviews powered by local LLMs (`qwen2.5`) and real-time webcam posture analysis (`moondream`).
+
+### 🗺️ Data-Ranked Learning Paths
+Stop guessing what to study. Placify automatically ranks learning modules using a custom algorithm: **Market Demand** (frequency in job postings) + **Outcome Impact** (Logistic Regression weight). 
+
+### 📊 Live Job Market Intelligence
+An interactive `Chart.js` dashboard showcasing the top hiring companies, highest-demand cities, and precise salary ranges across data science roles.
+
+---
+
+## 🧬 The Data Pipeline & Machine Learning
+
+Placify is not just a UI wrapper—it is driven by an automated Data ETL and ML training pipeline.
+
+1. **The Dataset:** We utilize four core datasets containing over 17,000 data science/analytics job postings, as well as employee behavioral and technical trait scoring datasets.
+2. **Data Cleaning:** The pipeline normalizes job titles, maps salary strings to numerical LPAs, splits comma-separated locations, and standardizes skills.
+3. **Model Training:** `scikit-learn` trains predictive Logistic Regression models targeting salary hikes and overall success metrics.
+4. **Edge Deployment:** Instead of running heavy Python models per user request, the script exports model weights, coefficients, and market distributions as highly optimized JSON files directly to the frontend. The browser handles the complex math locally, ensuring lightning-fast performance.
+
+---
+
+## 🏗️ Technical Architecture
+
+| Component | Technology | Description |
+| :--- | :--- | :--- |
+| **Frontend** | Vanilla JS, HTML, CSS | Ultra-lightweight static frontend with `Chart.js` for data visualization. |
+| **Hosting** | Vercel | Globally distributed edge hosting for the frontend. |
+| **Backend API** | Python, Flask | Modular engines for coding sandbox execution and AI routing. |
+| **Data Pipeline** | Pandas, Scikit-Learn | ETL pipeline that cleans CSVs and trains ML models, exporting to JSON. |
+| **AI Models** | Ollama | 100% local, private AI (`qwen2.5:1.5b` for NLP, `moondream` for Vision). |
+| **Networking** | Cloudflare Tunnels | Secure HTTP2 tunnels connecting the public Vercel frontend to the private local AI backend. |
+
+---
+
+## 🚀 Running Locally
+
+Want to run the full stack on your own machine? Follow these steps:
+
+### 1. Start the Local AI Engine
+You will need [Ollama](https://ollama.com/) installed to run the private AI models.
+```bash
+ollama pull qwen2.5:1.5b
+ollama pull moondream
+ollama serve
+```
+
+### 2. Boot up the Backend
+Install the Python dependencies and start the Flask API server:
+```bash
+pip install -r requirements.txt
+python app.py
+```
+
+### 3. Expose the Backend Securely
+Because Vercel requires HTTPS endpoints, we use Cloudflare Tunnels to expose your local Flask server securely without opening ports:
+```bash
+cloudflared tunnel --url http://localhost:5000 --protocol http2
+```
+
+### 4. Configure the Frontend
+1. Copy the generated `trycloudflare.com` URL from step 3.
+2. Update the API endpoints in `frontend/script.js` and `frontend/vercel.json` with your new tunnel URL.
+3. Deploy the `frontend/` directory to Vercel!
+
+### 5. Update Market Data
+To retrain the ML models and update the Job Market dashboard with fresh CSV data:
+1. Place your data files inside your defined `UPLOAD_DIR` (configured in the script).
+2. Run the ETL pipeline:
+```bash
+python scripts/prepare_data.py
+```
+3. The frontend will dynamically fetch the newly generated JSON files. No server restart required!
+
+---
+<div align="center">
+  <i>Built with ❤️ for the SAS CU Hackathon</i>
+</div>
