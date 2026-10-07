@@ -140,7 +140,18 @@
     </div>
   </div>
 
-  <script>\n      const API_BASE = 'https://coupon-casting-protocols-connection.trycloudflare.com';\n
+  <script>\n      const API_BASE = 'https://coupon-casting-protocols-connection.trycloudflare.com';
+
+const originalFetch = window.fetch;
+window.fetch = function() {
+    let [resource, config] = arguments;
+    if(config === undefined) {
+        config = {};
+    }
+    config.credentials = 'include';
+    return originalFetch(resource, config);
+};
+\n
     lucide.createIcons();
     
     document.getElementById('sessionForm').addEventListener('submit', async (e) => {

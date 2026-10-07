@@ -1,4 +1,15 @@
 const API_BASE = 'https://coupon-casting-protocols-connection.trycloudflare.com';
+
+const originalFetch = window.fetch;
+window.fetch = function() {
+    let [resource, config] = arguments;
+    if(config === undefined) {
+        config = {};
+    }
+    config.credentials = 'include';
+    return originalFetch(resource, config);
+};
+
 // Initialize Lucide Icons
 lucide.createIcons();
 

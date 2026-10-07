@@ -32,7 +32,7 @@ except ImportError:
 
 app = Flask(__name__)
 app.secret_key = os.environ.get('SECRET_KEY', 'default-secret-key-for-dev') # Change in production
-CORS(app)
+CORS(app, supports_credentials=True)
 
 # Initialize database
 init_db()
@@ -935,7 +935,7 @@ def scan_resume():
         
         return jsonify({'success': True, 'result': response_text})
     except Exception as e:
-        app.logger.error(f"Error scanning resume: {e}")
+        app.logger.error(f"Error scanning resume: {e}", exc_info=True)
         return jsonify({'success': False, 'error': str(e)}), 500
 
 
