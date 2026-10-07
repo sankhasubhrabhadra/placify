@@ -1,4 +1,9 @@
-<!DOCTYPE html>
+import re
+
+with open('frontend/simulator.html', 'r', encoding='utf-8') as f:
+    html = f.read()
+
+new_html = """<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -166,4 +171,9 @@
     loadModel();
   </script>
 </body>
-</html>
+</html>"""
+
+with open('frontend/simulator.html', 'w', encoding='utf-8') as f:
+    f.write(new_html)
+
+print("Updated simulator.html")

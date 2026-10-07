@@ -834,7 +834,7 @@
             {
               "id": "pytorch-tf",
               "title": "PyTorch & TensorFlow",
-              "status": "todo",
+              "status": "in-progress",
               "description": "Building and training neural networks using modern deep learning frameworks.",
               "resources": []
             },

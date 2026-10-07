@@ -153,7 +153,8 @@
           <i data-lucide="sparkles"></i>
           <span>Skill Simulator</span>
         </a>
-    </nav>
+    <a href="market.html" class="nav-item"><i data-lucide="bar-chart"></i><span>Job Market</span></a>
+      </nav>
     <div class="sidebar-footer">
       <a href="settings.html" class="nav-item"><i data-lucide="settings"></i><span>Settings</span></a>
     </div>
@@ -222,20 +223,41 @@ window.fetch = function() {
   let selectedNodeId = null, selectedRoadmapId = null;
 
   /* ── Load roadmap list ── */
-  async function loadRoadmaps() {
-    try {
-      const res = await fetch(API_BASE + '/api/learning/roadmaps');
-      const data = await res.json();
-      if (data.success) {
-        allRoadmaps = data.roadmaps;
-        renderSelector();
-        // Auto-open first
-        if (allRoadmaps.length) selectRoadmap(allRoadmaps[0].id);
-      }
-    } catch(e) { document.getElementById('roadmapSelector').innerHTML = '<div style="grid-column:1/-1;text-align:center;color:var(--error);padding:40px;">Failed to load. Is the server running?</div>'; }
-  }
-
-  function renderSelector() {
+  
+    async function loadRoadmaps() {
+      try {
+        const [rRes, mRes, jRes] = await Promise.all([
+          fetch(API_BASE + '/api/learning/roadmaps'),
+          fetch('data/skill_demand.json').catch(()=>({})),
+          fetch('data/jds_model.json').catch(()=>({}))
+        ]);
+        const data = await rRes.json();
+        
+        let marketData = {};
+        let jdsData = {features: [], coefficients: []};
+        try { marketData = await mRes.json(); } catch(e) {}
+        try { jdsData = await jRes.json(); } catch(e) {}
+        
+        if (data.success) {
+          // Re-order roadmaps based on demand + JDS weight
+          data.roadmaps.forEach(rm => {
+            let demandScore = marketData[rm.title.toLowerCase()] || 0;
+            let jdsWeight = 0;
+            const jdsIdx = jdsData.features.findIndex(f => rm.title.toLowerCase().includes(f.replace('_',' ')));
+            if (jdsIdx >= 0) jdsWeight = jdsData.coefficients[jdsIdx];
+            
+            rm.combinedScore = (demandScore * 0.01) + (jdsWeight * 10);
+            rm.reason = `High demand (${demandScore} postings) + ${jdsWeight ? 'strong link to salary hikes' : 'essential skill'}`;
+          });
+          
+          data.roadmaps.sort((a,b) => b.combinedScore - a.combinedScore);
+          allRoadmaps = data.roadmaps;
+          renderSelector();
+          if (allRoadmaps.length) selectRoadmap(allRoadmaps[0].id);
+        }
+      } catch(e) { console.error(e); }
+    }
+function renderSelector() {
     const sel = document.getElementById('roadmapSelector');
     sel.innerHTML = allRoadmaps.map(rm => `
       <div class="rm-card${activeRoadmapId===rm.id?' active':''}" onclick="selectRoadmap('${rm.id}')" id="rmCard_${rm.id}">

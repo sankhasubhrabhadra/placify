@@ -1,0 +1,171 @@
+{
+  "session_id": "252c6e75-3b50-40ea-a3e5-72f04c0f41fc",
+  "candidate_id": "1",
+  "created_at": "2026-10-06T20:26:25.579906",
+  "target": {
+    "company": "Google",
+    "role": "L4 Software Engineer",
+    "time_budget_minutes": 120,
+    "time_remaining_minutes": 120
+  },
+  "company_role_intelligence": {
+    "extracted_requirements": [
+      {
+        "skill": "Java",
+        "confidence": "HIGH",
+        "evidence": "Mentioned in study material, standard for L4 at Google"
+      },
+      {
+        "skill": "C++",
+        "confidence": "HIGH",
+        "evidence": "Standard for L4 at Google, mentions in interview patterns"
+      },
+      {
+        "skill": "Linux/Unix Shell Scripting",
+        "confidence": "HIGH",
+        "evidence": "Mentioned in study material and standard for L4 at Google"
+      },
+      {
+        "skill": "Git",
+        "confidence": "HIGH",
+        "evidence": "Standard for L4 at Google, commonly asked based on public interview patterns"
+      },
+      {
+        "skill": "AWS/EC2",
+        "confidence": "MEDIUM",
+        "evidence": "Mentioned in study material and standard for L4 at Google"
+      },
+      {
+        "skill": "Data Structures & Algorithms",
+        "confidence": "HIGH",
+        "evidence": "Standard for L4 at Google, mentioned in interview patterns"
+      },
+      {
+        "skill": "Database Management Systems (DBMS)",
+        "confidence": "MEDIUM",
+        "evidence": "Mentioned in study material and standard for L4 at Google"
+      },
+      {
+        "skill": "Networking Basics",
+        "confidence": "HIGH",
+        "evidence": "Standard for L4 at Google, mentioned in interview patterns"
+      },
+      {
+        "skill": "Software Design Patterns",
+        "confidence": "MEDIUM",
+        "evidence": "Commonly asked based on public interview patterns"
+      }
+    ],
+    "interview_patterns": [
+      "Given a technical problem, explain the solution using diagrams and pseudocode.",
+      "Describe your experience with version control systems like Git."
+    ]
+  },
+  "candidate": {
+    "resume_data": {
+      "raw_text": "I am a software engineer with 5 years of Python and React experience."
+    },
+    "skill_scores": [
+      {
+        "skill": "Java",
+        "score": 40,
+        "confidence": "LOW"
+      },
+      {
+        "skill": "C++",
+        "score": 60,
+        "confidence": "LOW"
+      }
+    ],
+    "strengths_notes": "Strong in arrays, weak in graphs"
+  },
+  "assessment_history": [
+    {
+      "timestamp": "2026-10-06T20:28:16.895373",
+      "type": "baseline_quiz",
+      "topic": "Java",
+      "difficulty": "medium",
+      "is_correct": false,
+      "score_delta": -10,
+      "mistakes": [
+        "Chose the wrong multiple choice option"
+      ]
+    },
+    {
+      "timestamp": "2026-10-06T20:28:24.684738",
+      "type": "baseline_quiz",
+      "topic": "C++",
+      "difficulty": "medium",
+      "is_correct": true,
+      "score_delta": 10,
+      "mistakes": []
+    },
+    {
+      "type": "baseline_quiz",
+      "topic": "Dummy",
+      "score_delta": 0
+    },
+    {
+      "type": "baseline_quiz",
+      "topic": "Dummy",
+      "score_delta": 0
+    },
+    {
+      "type": "baseline_quiz",
+      "topic": "Dummy",
+      "score_delta": 0
+    },
+    {
+      "type": "baseline_quiz",
+      "topic": "Dummy",
+      "score_delta": 0
+    },
+    {
+      "type": "baseline_quiz",
+      "topic": "Dummy",
+      "score_delta": 0
+    },
+    {
+      "type": "baseline_quiz",
+      "topic": "Dummy",
+      "score_delta": 0
+    }
+  ],
+  "current_plan": {
+    "activities": [
+      {
+        "id": 1,
+        "type": "baseline_quiz",
+        "topic": "General Assessment",
+        "status": "completed",
+        "reason": "We need to complete your baseline assessment to accurately map your skill gaps."
+      },
+      {
+        "id": 2,
+        "type": "learning_mode",
+        "topic": "Java",
+        "status": "completed",
+        "reason": "'Java' is a high-priority requirement (Gap size: 60) where you scored below the target threshold."
+      },
+      {
+        "id": 3,
+        "type": "learning_mode",
+        "topic": "Java",
+        "status": "completed",
+        "reason": "'Java' is a high-priority requirement (Gap size: 60) where you scored below the target threshold."
+      },
+      {
+        "id": 4,
+        "type": "quiz_mode",
+        "topic": "Java",
+        "status": "active",
+        "reason": "You just reviewed Java. Let's verify your understanding with a quick adaptive quiz."
+      }
+    ]
+  },
+  "session_metrics": {
+    "readiness_percent": 0.0,
+    "confidence_percent": 0.0,
+    "time_remaining_minutes": 120
+  }
+}

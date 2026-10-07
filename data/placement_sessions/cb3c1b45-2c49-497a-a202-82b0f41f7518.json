@@ -1,0 +1,61 @@
+{
+  "session_id": "cb3c1b45-2c49-497a-a202-82b0f41f7518",
+  "candidate_id": "1",
+  "created_at": "2026-10-06T20:50:22.140895",
+  "target": {
+    "company": "google",
+    "role": "software engineer ",
+    "time_budget_minutes": 120,
+    "time_remaining_minutes": 120
+  },
+  "company_role_intelligence": {
+    "extracted_requirements": [
+      {
+        "skill": "Java",
+        "confidence": "HIGH",
+        "evidence": "Mentioned in study material"
+      },
+      {
+        "skill": "SQL",
+        "confidence": "HIGH",
+        "evidence": "Commonly asked based on public interview patterns"
+      },
+      {
+        "skill": "JavaScript",
+        "confidence": "MEDIUM",
+        "evidence": "Tagged as a must-have skill for L4 level at Google's technical interviews"
+      },
+      {
+        "skill": "Git",
+        "confidence": "LOW",
+        "evidence": "Unmentioned in the study material but commonly used in many tech stacks and projects"
+      },
+      {
+        "skill": "English",
+        "confidence": "HIGH",
+        "evidence": "Standard for communication with clients, teammates, and management"
+      }
+    ],
+    "interview_patterns": [
+      "Technical Challenges (Leveraging Git, SQL, Java, JavaScript)",
+      "Behavioral Questions (Explain why you are good at programming languages like Python or JavaScript)",
+      "Design Problems (Addressing complex coding issues in real-world applications using these skills)"
+    ]
+  },
+  "candidate": {
+    "resume_data": {
+      "raw_text": "SANKHA SUBHRA BHADRA\nCSE (Data Science) Undergraduate | AI & Technology\n\u260e : 06294781370 \u2709 : ixasankhasubhrabhadra@gmail.com \ud83d\udccd : NC3, Chandigarh University, S.A.S Nagar, Punjab\nPortfolio | GitHub | LinkedIn | Facebook\nPROFILE\nB.E. Computer Science & Engineering (Data Science) student with hands-on experience building AI-powered applications using\nPython, FastAPI, LLMs, and APIs. Experienced in technology communities, event coordination, stakeholder communication, and\ntechnical troubleshooting. Strong interest in Agentic AI, AI-powered products, customer onboarding, and product operations,\nwith a practical approach to solving user and product-related challenges.\nDETAILS\nDate of Birth: 08/09/2005\nGender: Male\nAge : 21\nNationality: Indian\nEDUCATION\nB.E. Computer Science Engineering (Data Science)\nChandigarh University \u00b7 2nd Year \u00b7 Expected Graduation 2029\nHigher Secondary (WBCHSE)\nChakdaha Ramlal Academy\nTECHNICAL SKILLS\nLanguages: Python, Java, C++, C, JavaScript, SQL\nWeb & Frameworks: Ne"
+    },
+    "skill_scores": [],
+    "strengths_notes": ""
+  },
+  "assessment_history": [],
+  "current_plan": {
+    "activities": []
+  },
+  "session_metrics": {
+    "readiness_percent": 0.0,
+    "confidence_percent": 0.0,
+    "time_remaining_minutes": 120
+  }
+}

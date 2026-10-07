@@ -73,3 +73,14 @@ Job prep today is fragmented across coding practice sites, interview prep tools,
    cloudflared tunnel --url http://localhost:5000 --protocol http2
    ```
 4. **Connect the Frontend**: Update `frontend/vercel.json` with your generated Cloudflare URL, and deploy via Vercel.
+
+## Data Pipeline
+
+Placify is driven by real market and employee data. To update the market models and metrics:
+
+1. Place the four dataset files (Analytics_Jobs.csv, DataScience_Jobs.csv, JDS_Skill_Traits.xlsx, SDS_Personality_Traits.xlsx) into /mnt/user-data/uploads (or update UPLOAD_DIR in scripts/prepare_data.py).
+2. Run the script:
+   `ash
+   python scripts/prepare_data.py
+   ``n3. This will generate aggregated JSON files inside rontend/data/ representing skill demand, salary expectations, logistic regression models for predicting success, and a resume scanner index.
+4. The frontend fetches these JSON files dynamically, so no backend restart is required.

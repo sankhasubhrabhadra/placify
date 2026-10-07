@@ -1,0 +1,65 @@
+{
+  "session_id": "89e10f5d-79a9-4987-94f8-386167d1230c",
+  "candidate_id": "1",
+  "created_at": "2026-10-07T09:27:48.673648",
+  "target": {
+    "company": "amazon",
+    "role": "sde 2",
+    "time_budget_minutes": 2387,
+    "time_remaining_minutes": 2387
+  },
+  "company_role_intelligence": {
+    "extracted_requirements": [
+      {
+        "skill": "Python",
+        "confidence": "HIGH",
+        "evidence": "Mentioned in study material"
+      },
+      {
+        "skill": "Probability theory and statistics fundamentals",
+        "confidence": "HIGH",
+        "evidence": "CO1, CO2 objectives and experiment description"
+      },
+      {
+        "skill": "Data analysis with Jupyter Notebook or Google Colab",
+        "confidence": "MEDIUM",
+        "evidence": "Software Requirements - Python 3.x, Jupyter Notebook / Google Colab / VS Code"
+      },
+      {
+        "skill": "Programming skills in NumPy and SciPy libraries",
+        "confidence": "HIGH",
+        "evidence": "Software Requirements - Import required Python libraries: NumPy Library, SciPy Library"
+      },
+      {
+        "skill": "Understanding of statistical distributions (Binomial, Poisson, Normal)",
+        "confidence": "MEDIUM",
+        "evidence": "CO1 and CO2 objectives, theory section"
+      },
+      {
+        "skill": "Basic understanding of probability mass functions and density functions",
+        "confidence": "LOW",
+        "evidence": "Theory sections - Probability Mass Function, Normal Distribution PDF"
+      }
+    ],
+    "interview_patterns": [
+      "Describe how you approach solving complex problems with Python code.",
+      "Explain a time when you had to debug an unexpected probability distribution issue."
+    ]
+  },
+  "candidate": {
+    "resume_data": {
+      "raw_text": "Oct 5, 2026\nbhavishya pal\nhas successfully completed\nAI Agents and Agentic AI with Python & Generative\nAI\nan online course authorized by Vanderbilt University and offered through Coursera\nDr. Jules White Professor\nDepartment of Computer Science\nVanderbilt University\nVerify at:\nhttps://coursera.org/verify/OWDC8IELV6BI\nCoursera has confirmed the identity of this individual and their\nparticipation in the course.\nThis certi\u0000cate attests to the learner\u2019s completion of an online course / project delivered via Coursera. It does not constitute formal enrollment at any university or entity and does not itself grant academic credit, grades, or\na degree. Institutions or organizations may, at their discretion, recognize this learning toward their own programs or credentials.\n"
+    },
+    "skill_scores": [],
+    "strengths_notes": "python"
+  },
+  "assessment_history": [],
+  "current_plan": {
+    "activities": []
+  },
+  "session_metrics": {
+    "readiness_percent": 0.0,
+    "confidence_percent": 0.0,
+    "time_remaining_minutes": 2387
+  }
+}

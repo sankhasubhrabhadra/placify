@@ -153,12 +153,36 @@ async function initDashboard() {
         `).join('');
 
         const skillIcons = { 'React': 'code', 'TypeScript': 'terminal', 'Node.js': 'terminal', 'PostgreSQL': 'database', 'AWS': 'cloud', 'System Design': 'code' };
-        topSkillsContainer.innerHTML = data.top_skills.map(s => `
-          <span class="badge"><i data-lucide="${skillIcons[s] || 'code'}" class="text-primary badge-icon"></i> ${s}</span>
-        `).join('');
+        // Replaced by real market data logic below
         lucide.createIcons();
       }
     } catch(e) { console.error(e); }
+  }
+
+  
+  // Load real market skills for dashboard
+  if (topSkillsContainer) {
+    try {
+      const sRes = await fetch('data/skill_demand.json');
+      const sData = await sRes.json();
+      const top10 = Object.keys(sData).slice(0, 10);
+      topSkillsContainer.innerHTML = top10.map(s => `<span class="badge"><i data-lucide="code" class="text-primary badge-icon"></i>${s} <span style="opacity:0.6;font-size:0.75rem;margin-left:4px;">(${sData[s]})</span></span>`).join('');
+      
+      const locRes = await fetch('data/location_demand.json');
+      const locData = await locRes.json();
+      const topLocs = Object.keys(locData).slice(0, 2).join(', ');
+      
+      const roleRes = await fetch('data/salary_by_role.json');
+      const roleData = await roleRes.json();
+      const avgSal = roleData.reduce((acc, curr) => acc + (curr.avg_salary || 0), 0) / roleData.length;
+      
+      const marketCitiesEl = document.getElementById('marketCities');
+      const marketSalaryEl = document.getElementById('marketSalary');
+      if (marketCitiesEl) marketCitiesEl.innerText = topLocs;
+      if (marketSalaryEl) marketSalaryEl.innerText = avgSal.toFixed(1) + ' LPA';
+      
+      lucide.createIcons();
+    } catch(e) { console.error("Could not load market skills", e); }
   }
 
   if (timelineContainer) {

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Job Market - Placify</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style-additions.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    .market-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 2rem; }
+    @media (max-width: 768px) { .market-grid { grid-template-columns: 1fr; } }
+    .table-container { overflow-x: auto; max-height: 400px; }
+    table { width: 100%; border-collapse: collapse; text-align: left; }
+    th, td { padding: 0.75rem; border-bottom: 1px solid var(--border-color); }
+    th { position: sticky; top: 0; background: var(--surface-color); z-index: 1; }
+  </style>
+</head>
+<body>
+  <div class="layout-wrapper">
+    <aside class="sidebar">
+      <div class="sidebar-header">
+        <i data-lucide="code-2" class="text-primary mr-2"></i>
+        Placify
+      </div>
+      <nav class="sidebar-nav">
+        <a href="index.html" class="nav-item"><i data-lucide="layout-dashboard"></i><span>Dashboard</span></a>
+        <a href="placement_session.html" class="nav-item"><i data-lucide="briefcase"></i><span>Final Placement Prep</span></a>
+        <a href="jobs.html" class="nav-item"><i data-lucide="file-search"></i><span>Resume Scanner</span></a>
+        <a href="learning.html" class="nav-item"><i data-lucide="book-open"></i><span>Learning Paths</span></a>
+        <a href="interviews.html" class="nav-item"><i data-lucide="users"></i><span>Mock Interviews</span></a>
+        <a href="simulator.html" class="nav-item"><i data-lucide="trending-up"></i><span>Skill Simulator</span></a>
+        <a href="market.html" class="nav-item active"><i data-lucide="bar-chart"></i><span>Job Market</span></a>
+      </nav>
+    </aside>
+
+    <div class="main-content">
+      <header class="top-nav">
+        <div class="search-bar"><i data-lucide="search" class="text-secondary"></i><input type="text" placeholder="Search..." /></div>
+      </header>
+
+      <main class="content-area">
+        <h2 style="font-size: 1.5rem; font-weight: 600; margin-bottom: 0.5rem;">Job Market Intelligence</h2>
+        <p class="text-secondary" style="margin-bottom: 1.5rem; font-size: 0.9rem;">
+          Based on sample market data (2024-25) of over 17,000 analytics & data science job postings.
+        </p>
+
+        <div class="market-grid">
+            <div class="card">
+                <h3>Top Hiring Companies</h3>
+                <canvas id="companyChart" height="200"></canvas>
+            </div>
+            <div class="card">
+                <h3>High-Demand Locations</h3>
+                <canvas id="locationChart" height="200"></canvas>
+            </div>
+        </div>
+
+        <div class="card">
+            <div class="flex justify-between items-center mb-4">
+                <h3>Salary by Role & Experience</h3>
+                <input type="text" id="tableSearch" placeholder="Filter by company or role..." class="input" style="max-width: 300px;" onkeyup="filterTable()">
+            </div>
+            <div class="table-container">
+                <table id="rolesTable">
+                    <thead>
+                        <tr>
+                            <th>Company</th>
+                            <th>Job Title</th>
+                            <th>Min Exp</th>
+                            <th>Avg Salary (LPA)</th>
+                            <th>Positions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="rolesBody">
+                        <tr><td colspan="5">Loading data...</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+      </main>
+    </div>
+  </div>
+
+  <script>
+    lucide.createIcons();
+    
+    let allRoles = [];
+
+    async function loadData() {
+        try {
+            const [compRes, locRes, rolesRes] = await Promise.all([
+                fetch('data/company_hiring.json'),
+                fetch('data/location_demand.json'),
+                fetch('data/salary_by_role.json')
+            ]);
+            
+            const companies = await compRes.json();
+            const locations = await locRes.json();
+            allRoles = await rolesRes.json();
+            
+            renderCompanyChart(companies);
+            renderLocationChart(locations);
+            renderTable(allRoles);
+        } catch(e) {
+            console.error("Failed to load market data", e);
+        }
+    }
+
+    function renderCompanyChart(data) {
+        const keys = Object.keys(data).slice(0, 10);
+        const values = keys.map(k => data[k]);
+        new Chart(document.getElementById('companyChart'), {
+            type: 'bar',
+            data: { labels: keys, datasets: [{ label: 'Job Postings', data: values, backgroundColor: '#FFA116' }] },
+            options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        });
+    }
+
+    function renderLocationChart(data) {
+        const keys = Object.keys(data).slice(0, 7);
+        const values = keys.map(k => data[k]);
+        new Chart(document.getElementById('locationChart'), {
+            type: 'doughnut',
+            data: { labels: keys, datasets: [{ data: values, backgroundColor: ['#FFA116', '#00B8A3', '#3B82F6', '#8B5CF6', '#EC4899', '#10B981', '#F59E0B'] }] },
+            options: { responsive: true, maintainAspectRatio: false }
+        });
+    }
+
+    function renderTable(roles) {
+        const body = document.getElementById('rolesBody');
+        body.innerHTML = '';
+        roles.slice(0, 100).forEach(r => {
+            body.innerHTML += `
+                <tr>
+                    <td>${r.company_name}</td>
+                    <td>${r.job_title}</td>
+                    <td>${r.min_experience || 'N/A'}</td>
+                    <td class="text-success font-bold">${r.avg_salary ? r.avg_salary.toFixed(1) + 'L' : 'Undisclosed'}</td>
+                    <td>${r.num_of_jobs || 1}</td>
+                </tr>
+            `;
+        });
+    }
+
+    window.filterTable = function() {
+        const query = document.getElementById('tableSearch').value.toLowerCase();
+        const filtered = allRoles.filter(r => 
+            (r.company_name && r.company_name.toLowerCase().includes(query)) || 
+            (r.job_title && r.job_title.toLowerCase().includes(query))
+        );
+        renderTable(filtered);
+    }
+
+    loadData();
+  </script>
+</body>
+</html>
