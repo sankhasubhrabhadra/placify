@@ -94,7 +94,7 @@ if os.path.exists(analytics_file):
     with open(f"{DATA_DIR}/location_demand.json", 'w') as f: json.dump(loc_counts, f)
     
     # Jobs Index for resume scanner
-    jobs_index = data_roles[['job_desig', 'skills_list', 'locations_list', 'exp_min', 'exp_max', 'salary_mid']].dropna(subset=['job_desig']).to_dict(orient='records')
+    jobs_index = data_roles[['job_desig', 'skills_list', 'locations_list', 'exp_min', 'exp_max', 'salary_mid']].dropna(subset=['job_desig']).replace({np.nan: None}).to_dict(orient='records')
     with open(f"{DATA_DIR}/jobs_index.json", 'w') as f: json.dump(jobs_index, f)
 else:
     print(f"Warning: {analytics_file} not found.")
@@ -116,7 +116,7 @@ if os.path.exists(ds_file):
     company_hiring = df_ds.groupby('company_name')['num_of_jobs'].sum().sort_values(ascending=False).head(50).to_dict()
     with open(f"{DATA_DIR}/company_hiring.json", 'w') as f: json.dump(company_hiring, f)
     
-    roles = df_ds[['company_name', 'job_title', 'min_experience', 'min_salary', 'avg_salary', 'max_salary', 'num_of_jobs']].dropna(subset=['company_name', 'job_title']).to_dict(orient='records')
+    roles = df_ds[['company_name', 'job_title', 'min_experience', 'min_salary', 'avg_salary', 'max_salary', 'num_of_jobs']].dropna(subset=['company_name', 'job_title']).replace({np.nan: None}).to_dict(orient='records')
     with open(f"{DATA_DIR}/salary_by_role.json", 'w') as f: json.dump(roles, f)
 else:
     print(f"Warning: {ds_file} not found.")
