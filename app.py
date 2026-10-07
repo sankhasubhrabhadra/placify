@@ -901,18 +901,37 @@ def end_interview():
 @app.route('/api/resume/scan', methods=['POST'])
 def scan_resume():
     try:
-        file = request.files.get('resume')
-        text = request.form.get('text', '')
-        if file:
-            filename = secure_filename(file.filename)
-            import tempfile, uuid
-            temp_path = os.path.join(tempfile.gettempdir(), f'{uuid.uuid4()}_{filename}')
-            file.save(temp_path)
-            try:
-                text = extract_text(temp_path)
-            finally:
-                if os.path.exists(temp_path):
-                    os.remove(temp_path)
+        file = None
+        text = ''
+        
+        if request.is_json:
+            data = request.get_json()
+            text = data.get('text', '')
+            base64_data = data.get('resume_base64')
+            if base64_data:
+                import tempfile, uuid, base64
+                filename = data.get('filename', 'resume.pdf')
+                temp_path = os.path.join(tempfile.gettempdir(), f'{uuid.uuid4()}_{filename}')
+                with open(temp_path, 'wb') as f:
+                    f.write(base64.b64decode(base64_data))
+                try:
+                    text = extract_text(temp_path)
+                finally:
+                    if os.path.exists(temp_path):
+                        os.remove(temp_path)
+        else:
+            file = request.files.get('resume')
+            text = request.form.get('text', '')
+            if file:
+                filename = secure_filename(file.filename)
+                import tempfile, uuid
+                temp_path = os.path.join(tempfile.gettempdir(), f'{uuid.uuid4()}_{filename}')
+                file.save(temp_path)
+                try:
+                    text = extract_text(temp_path)
+                finally:
+                    if os.path.exists(temp_path):
+                        os.remove(temp_path)
         result = scan_resume_text(text, {'skills': ['python','django','fastapi','sql','react','javascript'], 'min_exp': 2})
         ai_feedback = None
         if text:
