@@ -925,7 +925,7 @@ def scan_resume():
         user = get_candidate_data(session.get('user_id', 1))
         user['candidate_skills'] = result.get('skills_found', [])
         user['resume_score'] = result.get('match_score', 0)
-        save_candidate_data(user)
+        save_candidate_data(session.get('user_id', 1), user)
         
         response_text = f"<h3>Resume Scan Complete</h3><p>Match Score: {result.get('match_score')}%</p>"
         if result.get('skills_found'):
