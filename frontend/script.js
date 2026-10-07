@@ -1,3 +1,4 @@
+const API_BASE = 'https://coupon-casting-protocols-connection.trycloudflare.com';
 // Initialize Lucide Icons
 lucide.createIcons();
 
@@ -11,7 +12,7 @@ async function initDashboard() {
 
   if (statsRow) {
     try {
-      const res = await fetch('/api/dashboard/stats');
+      const res = await fetch(API_BASE + '/api/dashboard/stats');
       const data = await res.json();
       if (data.success) {
         statsRow.innerHTML = `
@@ -69,7 +70,7 @@ async function initDashboard() {
 
   if (activityChartEl) {
     try {
-      const res = await fetch('/api/dashboard/chart');
+      const res = await fetch(API_BASE + '/api/dashboard/chart');
       const data = await res.json();
       if (data.success) {
         const ctx = activityChartEl.getContext('2d');
@@ -125,7 +126,7 @@ async function initDashboard() {
 
   if (progressContainer && topSkillsContainer) {
     try {
-      const res = await fetch('/api/dashboard/progress');
+      const res = await fetch(API_BASE + '/api/dashboard/progress');
       const data = await res.json();
       if (data.success) {
         progressContainer.innerHTML = data.progress.map(p => `
@@ -151,7 +152,7 @@ async function initDashboard() {
 
   if (timelineContainer) {
     try {
-      const res = await fetch('/api/dashboard/activity');
+      const res = await fetch(API_BASE + '/api/dashboard/activity');
       const data = await res.json();
       if (data.success) {
         timelineContainer.innerHTML = data.activities.map(a => `
@@ -179,7 +180,7 @@ async function initInterviews() {
   
   if (upcomingContainer && pastContainer) {
     try {
-      const res = await fetch('/api/interviews');
+      const res = await fetch(API_BASE + '/api/interviews');
       const data = await res.json();
       if (data.success) {
         upcomingContainer.innerHTML = data.upcoming.map(u => `
@@ -224,7 +225,7 @@ async function initLearningPaths() {
   const pathsContainer = document.getElementById('paths-container');
   if (pathsContainer) {
     try {
-      const res = await fetch('/api/learning/paths');
+      const res = await fetch(API_BASE + '/api/learning/paths');
       const data = await res.json();
       if (data.success) {
         pathsContainer.innerHTML = data.paths.map(p => `
@@ -274,7 +275,7 @@ async function sendMessage() {
     chatMessages.scrollTop = chatMessages.scrollHeight;
 
     try {
-      const res = await fetch('/api/chat', {
+      const res = await fetch(API_BASE + '/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ message: text })
@@ -313,7 +314,7 @@ async function initSettings() {
 
   if (profileForm && preferencesForm) {
     try {
-      const res = await fetch('/api/user/profile');
+      const res = await fetch(API_BASE + '/api/user/profile');
       const data = await res.json();
       if (data.success) {
         document.getElementById('profile-name').value = data.profile.name;
@@ -328,7 +329,7 @@ async function initSettings() {
     profileForm.addEventListener('submit', async (e) => {
       e.preventDefault();
       try {
-        const res = await fetch('/api/user/profile', {
+        const res = await fetch(API_BASE + '/api/user/profile', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
@@ -354,7 +355,7 @@ async function initLogin() {
       const email = document.getElementById('login-email').value;
       const password = document.getElementById('login-password').value;
       try {
-        const res = await fetch('/api/auth/login', {
+        const res = await fetch(API_BASE + '/api/auth/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email, password })
@@ -429,7 +430,7 @@ initLogin();
     }
 
     try {
-      const response = await fetch('/api/resume/scan', {
+      const response = await fetch(API_BASE + '/api/resume/scan', {
         method: 'POST',
         body: formData
       });
@@ -453,7 +454,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   
   // Check auth state
   try {
-    const res = await fetch('/api/auth/me');
+    const res = await fetch(API_BASE + '/api/auth/me');
     const data = await res.json();
     if (data.success) {
       if (isAuthPage) window.location.href = 'index.html'; // Redirect to dashboard if logged in
@@ -487,7 +488,7 @@ window.handleLogin = async function() {
   const password = document.getElementById('login-password').value;
   
   try {
-    const res = await fetch('/api/auth/login', {
+    const res = await fetch(API_BASE + '/api/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ email, password })
@@ -510,7 +511,7 @@ window.handleSignup = async function() {
   const password = document.getElementById('signup-password').value;
   
   try {
-    const res = await fetch('/api/auth/signup', {
+    const res = await fetch(API_BASE + '/api/auth/signup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ name, email, password, role })
@@ -528,7 +529,7 @@ window.handleSignup = async function() {
 
 window.handleLogout = async function() {
   try {
-    await fetch('/api/auth/logout', { method: 'POST' });
+    await fetch(API_BASE + '/api/auth/logout', { method: 'POST' });
     window.location.href = 'login.html';
   } catch (e) {
     console.error(e);
@@ -545,7 +546,7 @@ window.closeScheduleModal = function() {
 window.submitSchedule = async function() {
   const topic = document.getElementById('scheduleTopic').value;
   try {
-    const res = await fetch('/api/interviews/schedule', {
+    const res = await fetch(API_BASE + '/api/interviews/schedule', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ topic: topic })
@@ -563,7 +564,7 @@ window.viewFeedback = async function(id) {
   lucide.createIcons();
   
   try {
-    const res = await fetch('/api/interviews/' + id + '/feedback');
+    const res = await fetch(API_BASE + '/api/interviews/' + id + '/feedback');
     const data = await res.json();
     if(data.success && data.feedback) {
       let html = data.feedback.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>').replace(/\n/g, '<br>');

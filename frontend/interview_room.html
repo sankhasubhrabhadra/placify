@@ -52,7 +52,7 @@
     const dataUrl = canvas.toDataURL('image/jpeg', 0.5);
     
     try {
-      const res = await fetch('/api/interviews/session/analyze_frame', {
+      const res = await fetch(API_BASE + '/api/interviews/session/analyze_frame', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: dataUrl })
@@ -79,7 +79,7 @@
     document.getElementById('reviewContent').innerHTML = "Generating comprehensive feedback on your technical skills, body language, and expressions... Please wait.";
 
     try {
-      const res = await fetch('/api/interviews/session/end', {
+      const res = await fetch(API_BASE + '/api/interviews/session/end', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: chatMessages, topic: topic, vision_context: visionContext })
@@ -214,7 +214,7 @@
   </div>
 </div>
 
-<script>
+<script>\n      const API_BASE = 'https://coupon-casting-protocols-connection.trycloudflare.com';\n
   lucide.createIcons();
 
   /* ── State ── */
@@ -272,7 +272,7 @@
     chatHistoryEl.scrollTop = chatHistoryEl.scrollHeight;
 
     try {
-      const res = await fetch('/api/interviews/session/chat', {
+      const res = await fetch(API_BASE + '/api/interviews/session/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -363,7 +363,7 @@
     const dataUrl = canvas.toDataURL('image/jpeg', 0.5);
     
     try {
-      const res = await fetch('/api/interviews/session/analyze_frame', {
+      const res = await fetch(API_BASE + '/api/interviews/session/analyze_frame', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ image: dataUrl })
@@ -390,7 +390,7 @@
     document.getElementById('reviewContent').innerHTML = "Generating comprehensive feedback on your technical skills, body language, and expressions... Please wait.";
 
     try {
-      const res = await fetch('/api/interviews/session/end', {
+      const res = await fetch(API_BASE + '/api/interviews/session/end', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ messages: chatMessages, topic: topic, vision_context: visionContext })

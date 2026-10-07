@@ -140,7 +140,7 @@
     </div>
   </div>
 
-  <script>
+  <script>\n      const API_BASE = 'https://coupon-casting-protocols-connection.trycloudflare.com';\n
     lucide.createIcons();
     
     document.getElementById('sessionForm').addEventListener('submit', async (e) => {
@@ -166,7 +166,7 @@
         const studyMaterial = document.getElementById('studyMaterial').files[0];
         if(studyMaterial) formData.append('studyMaterial', studyMaterial);
 
-        const res = await fetch('/api/placement-session/create', {
+        const res = await fetch(API_BASE + '/api/placement-session/create', {
           method: 'POST',
           body: formData
         });
