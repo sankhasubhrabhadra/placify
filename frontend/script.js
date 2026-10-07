@@ -1,4 +1,4 @@
-const API_BASE = 'https://coupon-casting-protocols-connection.trycloudflare.com';
+const API_BASE = 'https://playing-legitimate-suspended-unnecessary.trycloudflare.com';
 
 const originalFetch = window.fetch;
 window.fetch = function() {
