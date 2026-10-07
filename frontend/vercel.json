@@ -2,7 +2,7 @@
     "rewrites": [
       {
         "source": "/api/(.*)",
-        "destination": "https://repair-pregnant-intelligent-configuring.trycloudflare.com/api/$1"
+        "destination": "https://admit-allow-make-returns.trycloudflare.com/api/$1"
       }
     ]
 }

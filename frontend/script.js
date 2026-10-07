@@ -1,4 +1,4 @@
-const API_BASE = 'https://repair-pregnant-intelligent-configuring.trycloudflare.com';
+const API_BASE = 'https://admit-allow-make-returns.trycloudflare.com';
 
 const originalFetch = window.fetch;
 window.fetch = function() {
