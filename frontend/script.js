@@ -1,4 +1,4 @@
-const API_BASE = 'https://playing-legitimate-suspended-unnecessary.trycloudflare.com';
+const API_BASE = 'https://repair-pregnant-intelligent-configuring.trycloudflare.com';
 
 const originalFetch = window.fetch;
 window.fetch = function() {
