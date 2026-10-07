@@ -448,6 +448,7 @@ initLogin();
           payload.resume_base64 = base64;
       }
 
+      try {
       const response = await fetch(API_BASE + '/api/resume/scan', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
