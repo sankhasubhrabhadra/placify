@@ -427,23 +427,31 @@ initLogin();
   parseBtn.addEventListener('click', async () => {
     resultsEl.innerHTML = '<div class="card">Scanning...</div>';
     
-    const formData = new FormData();
     const file = fileInput && fileInput.files && fileInput.files[0];
-    if (file) {
-      formData.append('resume', file);
-    } else if (pasteArea && pasteArea.value.trim()) {
-      formData.append('text', pasteArea.value);
-    }
+      const textVal = pasteArea && pasteArea.value ? pasteArea.value.trim() : '';
 
-    if (!file && (!pasteArea || !pasteArea.value.trim())) {
-      resultsEl.innerHTML = '<div class="card">No resume provided. Upload a PDF or paste text.</div>';
-      return;
-    }
+      if (!file && !textVal) {
+        resultsEl.innerHTML = '<div class="card">No resume provided. Upload a PDF or paste text.</div>';
+        return;
+      }
 
-    try {
+      let payload = { text: textVal };
+      if (file) {
+          payload.filename = file.name;
+          // Convert file to base64
+          const base64 = await new Promise((resolve, reject) => {
+              const reader = new FileReader();
+              reader.readAsDataURL(file);
+              reader.onload = () => resolve(reader.result.split(',')[1]);
+              reader.onerror = error => reject(error);
+          });
+          payload.resume_base64 = base64;
+      }
+
       const response = await fetch(API_BASE + '/api/resume/scan', {
         method: 'POST',
-        body: formData
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
       const data = await response.json();
       
