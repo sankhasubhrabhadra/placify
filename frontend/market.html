@@ -97,9 +97,9 @@
                 fetch('data/salary_by_role.json')
             ]);
             
-            const companies = await compRes.json();
-            const locations = await locRes.json();
-            allRoles = await rolesRes.json();
+            const compText = await compRes.text(); const companies = JSON.parse(compText.replace(/NaN/g, "null"));
+            const locText = await locRes.text(); const locations = JSON.parse(locText.replace(/NaN/g, "null"));
+            const rolesText = await rolesRes.text(); allRoles = JSON.parse(rolesText.replace(/NaN/g, "null"));
             
             renderCompanyChart(companies);
             renderLocationChart(locations);
@@ -138,7 +138,7 @@
                     <td>${r.company_name}</td>
                     <td>${r.job_title}</td>
                     <td>${r.min_experience || 'N/A'}</td>
-                    <td class="text-success font-bold">${r.avg_salary ? r.avg_salary.toFixed(1) + 'L' : 'Undisclosed'}</td>
+                    <td class="text-success font-bold">${r.avg_salary ? Number(r.avg_salary).toFixed(1) + 'L' : 'Undisclosed'}</td>
                     <td>${r.num_of_jobs || 1}</td>
                 </tr>
             `;
