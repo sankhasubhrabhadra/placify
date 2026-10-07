@@ -7,7 +7,7 @@ window.fetch = function() {
         config = {};
     }
     config.credentials = 'include';
-    return originalFetch(resource, config);
+    return originalFetch.call(window, resource, config);
 };
 
 // Initialize Lucide Icons
