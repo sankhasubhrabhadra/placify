@@ -125,7 +125,7 @@ async function initDashboard() {
             },
             scales: {
               x: { grid: { display: false, drawBorder: false }, ticks: { color: textSecondary, font: { size: 12 } } },
-              y: { grid: { color: borderColor, drawBorder: false, borderDash: [3, 3] }, ticks: { color: textSecondary, font: { size: 12 }, stepSize: 5 } }
+              y: { min: 0, suggestedMax: 5, grid: { color: borderColor, drawBorder: false, borderDash: [3, 3] }, ticks: { color: textSecondary, font: { size: 12 }, stepSize: 1 } }
             }
           }
         });
