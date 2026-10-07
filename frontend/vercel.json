@@ -1,8 +1,8 @@
 {
-  "rewrites": [
-    {
-      "source": "/api/(.*)",
-      "destination": "https://fifteen-icons-remainder-relationships.trycloudflare.com/api/$1"
-    }
-  ]
+    "rewrites": [
+      {
+        "source": "/api/(.*)",
+        "destination": "https://grade-helmet-boxing-providing.trycloudflare.com/api/$1"
+      }
+    ]
 }
